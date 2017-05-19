@@ -21,6 +21,11 @@ public class PlayerControl : MonoBehaviour {
 	public float jumpWindow = 0.3f; //Time the player has for doing a walljump after collision
 	public float velocityThresh = 6.0f; //minimum velocity required for a walljump. LESS THAN 1 BREAKS THE WALLJUMP
 
+	//Slide parameters:
+	public float slideThresh = 14.0f;	//How fast you need to go to slide
+	public float slideBoost	= 800;		//Speedboost for slide start
+	public float slideBreak = 2;		//How fast you lose speed while sliding
+
 	//reference shorthand
 	private Animator anim;
 	private Rigidbody2D rigid;
@@ -37,9 +42,11 @@ public class PlayerControl : MonoBehaviour {
 	int fallState;
 	int backflipState;
 	int walljumpState;
+	int slideState;
 
 	//internal state
 	bool jumping = false;
+	bool sliding = false;
 	float currentInputMove;		//current horizontal input
 	float currentInputJump;		//current horizontal input
 	AnimatorStateInfo currentState;
@@ -67,6 +74,7 @@ public class PlayerControl : MonoBehaviour {
 		fallState = Animator.StringToHash("Base Layer.Fall");
 		backflipState = Animator.StringToHash("Base Layer.Backflip");
 		walljumpState = Animator.StringToHash("Base Layer.WallJump");
+		slideState = Animator.StringToHash("Base Layer.Slide");
 
 		gravMem = rigid.gravityScale;
 	}
@@ -86,7 +94,7 @@ public class PlayerControl : MonoBehaviour {
 		anim.SetBool("DirAlign", currentInputMove * rigid.velocity.x >= 0);
 
 		//Jumping:
-		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState)
+		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState || currentState.fullPathHash == slideState)
 		{
 			if(Input.GetButtonDown("Jump"))
 			{
@@ -114,27 +122,20 @@ public class PlayerControl : MonoBehaviour {
 				windowTimer = -1;
 			}
 		}
+
+		//Sliding
+		if(currentState.fullPathHash == runState && Input.GetButtonDown("Slide") && Mathf.Abs(rigid.velocity.x) > slideThresh)
+		{
+			sliding = true;
+			anim.SetTrigger("Slide");
+		}
 	}
 
 	void FixedUpdate ()
 	{
 		//Ground Movement
-		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState)
+		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState || currentState.fullPathHash == slideState)
 		{
-			rigid.AddForce(Vector2.right * currentInputMove * moveForceGround);
-			if(currentInputMove == 0)	//Slow down when no direction is pressed
-			{
-				rigid.AddForce(Vector2.left * rigid.velocity.x * autoBreak);
-			}
-			if(Mathf.Abs(rigid.velocity.x) < 1)		//looks more natural
-			{
-				rigid.velocity = new Vector2(0, rigid.velocity.y);
-			}
-			if(Mathf.Abs(rigid.velocity.x) > maxSpeed)	//cap max speed
-			{
-				rigid.velocity = new Vector2(Mathf.Sign(rigid.velocity.x) * maxSpeed, rigid.velocity.y);
-			}
-
 			if(jumping)
 			{
 				// Make sure the player can't jump again until the jump conditions from Update are satisfied.
@@ -145,6 +146,23 @@ public class PlayerControl : MonoBehaviour {
 					//Doing a backflip might do something special
 					rigid.AddForce(Vector2.Scale(backflipForce, (Vector2.right * Mathf.Sign(transform.localScale.x))));
 					// ^ adding an additional backwards force on a backflip feels good
+				}
+			}
+
+			if(currentState.fullPathHash != slideState)
+			{
+				rigid.AddForce(Vector2.right * currentInputMove * moveForceGround);
+				if(currentInputMove == 0)	//Slow down when no direction is pressed
+				{
+					rigid.AddForce(Vector2.left * rigid.velocity.x * autoBreak);
+				}
+				if(Mathf.Abs(rigid.velocity.x) < 1)		//looks more natural
+				{
+					rigid.velocity = new Vector2(0, rigid.velocity.y);
+				}
+				if(Mathf.Abs(rigid.velocity.x) > maxSpeed)	//cap max speed
+				{
+					rigid.velocity = new Vector2(Mathf.Sign(rigid.velocity.x) * maxSpeed, rigid.velocity.y);
 				}
 			}
 		}
@@ -170,11 +188,12 @@ public class PlayerControl : MonoBehaviour {
 			}
 		}
 
-		//Walljump
+		//Walljump TODO
 		/*
 		 * Make bad Walljumps better (minimum outgoing x and y speed?)
 		 * change angle calculation to allow for more horizontal jumps
 		 * make maximum vertical jumps worse?
+		 * Give bonus to away jumps?
 		 */
 		if(currentState.fullPathHash == walljumpState)
 		{
@@ -193,6 +212,7 @@ public class PlayerControl : MonoBehaviour {
 			Vector2 jumpvec = (Vector2) Vector3.Slerp(new Vector3(-Mathf.Sign(incomingVelocity.x), 1, 0).normalized, Vector3.up, angleFactor);
 			Vector2 compareAngle = new Vector2(Mathf.Abs(incomingVelocity.x), Mathf.Abs(incomingVelocity.y)).normalized;
 			float force = 1 - wjAnglePenalty * Vector2.Angle(Vector2.one.normalized, compareAngle)/45;
+			//float forceOut = 1.1f - angleFactor * 0.2f;
 			rigid.velocity = force * (jumpvec * Mathf.Abs(incomingVelocity.x) + new Vector2(0, incomingVelocity.y));
 			//rigid.velocity = 35 * jumpvec;		//this alternative also feels ok
 
@@ -203,8 +223,21 @@ public class PlayerControl : MonoBehaviour {
 				flipper.FaceDir(rigid.velocity.x > 0);
 			}
 		}
+
+		//Slide
+		if(sliding)
+		{
+			sliding = false;
+			rigid.AddForce(Vector2.right * (Mathf.Sign(transform.localScale.x) * slideBoost));
+		}
+		if(currentState.fullPathHash == slideState)
+		{
+			rigid.AddForce(Vector2.left * rigid.velocity.x * slideBreak);
+		}
 	}
 
+	/*
+	// For Debugging:
 	void OnGUI()
 	{
 		//int w = Mathf.RoundToInt(Screen.width * size), h = Mathf.RoundToInt(Screen.height * size);
@@ -219,4 +252,5 @@ public class PlayerControl : MonoBehaviour {
 		string text = string.Format("{0:0.0} ms \n ({1:0.} vel)", windowTimer, rigid.velocity);
 		GUI.Label(rect, text, style);
 	}
+	*/
 }
