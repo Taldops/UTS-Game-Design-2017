@@ -21,7 +21,7 @@ public class PlayerControl : MonoBehaviour {
 	public float jumpWindow = 0.3f; //Time the player has for doing a walljump after collision
 	public float velocityThresh = 6.0f; //minimum velocity required for a walljump. LESS THAN 1 BREAKS THE WALLJUMP
 
-	//Slide parameters:
+	//Action parameters:
 	public float slideThresh = 14.0f;	//How fast you need to go to slide
 	public float slideBoost	= 800;		//Speedboost for slide start
 	public float slideBreak = 2;		//How fast you lose speed while sliding
@@ -30,6 +30,7 @@ public class PlayerControl : MonoBehaviour {
 	private Animator anim;
 	private Rigidbody2D rigid;
 	private FlipSprite flipper;
+	private GameObject body;
 	private OverlapCheck groundCheck;
 	private OverlapCheck[] wallChecks;
 
@@ -42,10 +43,12 @@ public class PlayerControl : MonoBehaviour {
 	int backflipState;
 	int walljumpState;
 	int slideState;
+	int diveState;
+	int rollState;
 
 	//internal state
-	bool jumping = false;
-	bool sliding = false;
+	bool jumping = false;	//keep track of jumoing
+	bool action = false;	//keep track of sliding and diving
 	float currentInputMove;		//current horizontal input
 	float currentInputJump;		//current horizontal input
 	AnimatorStateInfo currentState;
@@ -62,6 +65,7 @@ public class PlayerControl : MonoBehaviour {
 		anim = GetComponentInChildren<Animator>();
 		rigid = GetComponent<Rigidbody2D>();
 		flipper = GetComponentInChildren<FlipSprite>();
+		body = transform.FindChild("Body").gameObject;
 		wallChecks = new OverlapCheck[2];
 		wallChecks[0]= transform.FindChild("WallCheck1").GetComponent<OverlapCheck>();
 		wallChecks[1] = transform.FindChild("WallCheck2").GetComponent<OverlapCheck>();
@@ -75,6 +79,8 @@ public class PlayerControl : MonoBehaviour {
 		backflipState = Animator.StringToHash("Base Layer.Backflip");
 		walljumpState = Animator.StringToHash("Base Layer.WallJump");
 		slideState = Animator.StringToHash("Base Layer.Slide");
+		diveState = Animator.StringToHash("Base Layer.Dive");
+		rollState = Animator.StringToHash("Base Layer.Roll");
 
 		gravMem = rigid.gravityScale;
 	}
@@ -124,11 +130,25 @@ public class PlayerControl : MonoBehaviour {
 			}
 		}
 
+		//Action States
 		//Sliding
-		if(currentState.fullPathHash == runState && Input.GetButtonDown("Slide") && Mathf.Abs(rigid.velocity.x) > slideThresh)
+		if(((currentState.fullPathHash == runState && Mathf.Abs(rigid.velocity.x) > slideThresh)		//Sliding conditions
+			|| (currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState))			//Diving conditions
+			&& Input.GetButtonDown("Action"))															//Input for either
 		{
-			sliding = true;
-			anim.SetTrigger("Slide");
+			action = true;
+			anim.SetTrigger("Action");
+		}
+		//Dive orientation
+		if(currentState.fullPathHash == diveState)
+		{
+			body.transform.right = flipper.direction * rigid.velocity + 0.1f * flipper.direction * Vector2.right;
+		}
+		//Rolling after diving resets orientation and action status
+		if(currentState.fullPathHash == rollState)
+		{
+			body.transform.up = Vector3.up;
+			action = false;
 		}
 	}
 
@@ -150,7 +170,18 @@ public class PlayerControl : MonoBehaviour {
 				}
 			}
 
-			if(currentState.fullPathHash != slideState)
+			if(action) //Slide
+			{
+				action = false;
+				rigid.AddForce(Vector2.right * (flipper.direction * slideBoost));
+			}
+
+			//Friction
+			if(currentState.fullPathHash == slideState)
+			{
+				rigid.AddForce(Vector2.left * rigid.velocity.x * slideBreak);
+			}
+			else
 			{
 				rigid.AddForce(Vector2.right * currentInputMove * moveForceGround);
 				if(currentInputMove == 0)	//Slow down when no direction is pressed
@@ -186,6 +217,12 @@ public class PlayerControl : MonoBehaviour {
 			if(rigid.velocity.y < -maxFallSpeed)		//cap fall speed
 			{
 				rigid.velocity = Vector2.down * maxFallSpeed;
+			}
+			//Diving
+			if(action)
+			{
+				//Commence dive
+				rigid.velocity = new Vector2(flipper.direction * Mathf.Max(Mathf.Abs(rigid.velocity.x), maxSpeed) , rigid.velocity.y);
 			}
 		}
 
@@ -223,17 +260,6 @@ public class PlayerControl : MonoBehaviour {
 			{
 				flipper.FaceDir(rigid.velocity.x > 0);
 			}
-		}
-
-		//Slide
-		if(sliding)
-		{
-			sliding = false;
-			rigid.AddForce(Vector2.right * (flipper.direction * slideBoost));
-		}
-		if(currentState.fullPathHash == slideState)
-		{
-			rigid.AddForce(Vector2.left * rigid.velocity.x * slideBreak);
 		}
 	}
 
