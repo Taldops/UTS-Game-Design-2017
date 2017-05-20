@@ -126,8 +126,6 @@ public class PlayerControl : MonoBehaviour {
 		if(currentState.fullPathHash == vaultState || currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState)
 		{
 			Vector3 from = flipper.direction * body.transform.right;
-
-			print(from);
 			Vector3 to = Vector3.right * flipper.direction;
 			body.transform.right = flipper.direction * Vector3.Slerp(from, to, 4 * currentState.speed * Time.deltaTime);
 		}
@@ -159,7 +157,9 @@ public class PlayerControl : MonoBehaviour {
 		//Dive orientation
 		if(currentState.fullPathHash == diveState)
 		{
-			body.transform.right = flipper.direction * rigid.velocity + 0.1f * flipper.direction * Vector2.right;
+			Vector2 v = (rigid.velocity + flipper.direction * 0.05f * Vector2.right);
+			v = (v.SqrMagnitude() > 1) ? v.normalized : v;
+			body.transform.right = new Vector3(Mathf.Cos(v.y), flipper.direction *  v.y, 0);
 		}
 		//Rolling after diving resets orientation and vault status
 		if(currentState.fullPathHash == rollState)
