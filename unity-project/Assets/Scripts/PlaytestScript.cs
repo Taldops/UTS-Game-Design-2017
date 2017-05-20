@@ -4,16 +4,18 @@ using UnityEngine;
 
 public class PlaytestScript : MonoBehaviour {
 
-	public float time;		//Playing time displayed in the upper right corner
-	public bool completed = false;	//Has the player reached the goal yet?
+	[HideInInspector] public float time;		//Playing time displayed in the upper right corner
+	[HideInInspector] public bool completed = false;	//Has the player reached the goal yet?
 
-	private Vector2 startingPos;
+	private GameObject player;
+	private Vector3 startingPos;
 
 	// Use this for initialization
-	void Start () {
-		startingPos = (Vector2) transform.position;
+	void Awake () {
+		player = GameObject.FindGameObjectWithTag("Player");
+		startingPos = player.transform.position;
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		if(!completed)
@@ -24,9 +26,16 @@ public class PlaytestScript : MonoBehaviour {
 		//Reset Button
 		if(Input.GetKeyDown(KeyCode.R))
 		{
-			transform.position = startingPos;
+			player.transform.position = startingPos;
 			time = 0;
 			completed = false;
+		}
+	}
+
+	void OnTriggerEnter2D(Collider2D other) {
+		if(other.gameObject.transform.root.tag == "Player")
+		{
+			completed = true;
 		}
 	}
 
