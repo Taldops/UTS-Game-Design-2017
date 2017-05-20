@@ -31,8 +31,7 @@ public class PlayerControl : MonoBehaviour {
 	private Rigidbody2D rigid;
 	private FlipSprite flipper;
 	private OverlapCheck groundCheck;
-	private OverlapCheck wallCheckFront;
-	private OverlapCheck wallCheckBack;
+	private OverlapCheck[] wallChecks;
 
 	//Animation State Hashes:
 	int idleState;
@@ -60,11 +59,12 @@ public class PlayerControl : MonoBehaviour {
 	void Awake () {
 		// Setting up references.
 		groundCheck = transform.FindChild("GroundCheck").GetComponent<OverlapCheck>();
-		anim = GetComponent<Animator>();
+		anim = GetComponentInChildren<Animator>();
 		rigid = GetComponent<Rigidbody2D>();
-		flipper = GetComponent<FlipSprite>();
-		wallCheckFront = transform.FindChild("WallCheckFront").GetComponent<OverlapCheck>();
-		wallCheckBack = transform.FindChild("WallCheckBack").GetComponent<OverlapCheck>();
+		flipper = GetComponentInChildren<FlipSprite>();
+		wallChecks = new OverlapCheck[2];
+		wallChecks[0]= transform.FindChild("WallCheck1").GetComponent<OverlapCheck>();
+		wallChecks[1] = transform.FindChild("WallCheck2").GetComponent<OverlapCheck>();
 
 		//Animation state setup
 		idleState = Animator.StringToHash("Base Layer.Idle");
@@ -110,7 +110,8 @@ public class PlayerControl : MonoBehaviour {
 		}
 
 		//Test for Walljump
-		bool wallCollision = (wallCheckBack.overlaps && rigid.velocity.x * transform.localScale.x < 0) || (wallCheckFront.overlaps && rigid.velocity.x * transform.localScale.x > 0);
+		int frontCheck = (flipper.direction * (wallChecks[0].gameObject.transform.position.x - transform.position.x) > 0) ? 0 : 1;
+		bool wallCollision = (wallChecks[frontCheck].overlaps && rigid.velocity.x * flipper.direction > 0) || (wallChecks[1 - frontCheck].overlaps && rigid.velocity.x * flipper.direction < 0);
 		if((currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState || currentState.fullPathHash == backflipState)
 			&& wallCollision && Mathf.Abs(rigid.velocity.x) >= velocityThresh && (windowTimer < 0 || Mathf.Abs(rigid.velocity.x) > Mathf.Abs(incomingVelocity.x)))
 		{
@@ -144,7 +145,7 @@ public class PlayerControl : MonoBehaviour {
 				if(currentState.fullPathHash == skidState)
 				{	
 					//Doing a backflip might do something special
-					rigid.AddForce(Vector2.Scale(backflipForce, (Vector2.right * Mathf.Sign(transform.localScale.x))));
+					rigid.AddForce(Vector2.Scale(backflipForce, (Vector2.right * flipper.direction)));
 					// ^ adding an additional backwards force on a backflip feels good
 				}
 			}
@@ -199,7 +200,7 @@ public class PlayerControl : MonoBehaviour {
 		{
 			jumping = true;
 			rigid.gravityScale = 0;
-			rigid.velocity = new Vector2(Mathf.Sign(transform.localScale.x) * 0, rigid.velocity.y * 0.5f);
+			rigid.velocity = new Vector2(flipper.direction * 0, rigid.velocity.y * 0.5f);
 			flipper.FaceDir(incomingVelocity.x > 0);
 		}
 		else
@@ -228,7 +229,7 @@ public class PlayerControl : MonoBehaviour {
 		if(sliding)
 		{
 			sliding = false;
-			rigid.AddForce(Vector2.right * (Mathf.Sign(transform.localScale.x) * slideBoost));
+			rigid.AddForce(Vector2.right * (flipper.direction * slideBoost));
 		}
 		if(currentState.fullPathHash == slideState)
 		{

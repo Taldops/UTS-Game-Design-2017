@@ -1,23 +1,29 @@
-﻿using System.Collections;
+﻿/*
+ * Mirrors the Sprite horizontally
+ * */
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class FlipSprite : MonoBehaviour {
 
 	[HideInInspector]
-	public bool facingRight = true;
+	public float direction;	//1: facing right, -1: facing left
+
+	private SpriteRenderer sprite;
 
 	public void Awake()
 	{
-		facingRight = transform.localScale.x > 0;
+		sprite = GetComponent<SpriteRenderer>();
+		//It assumes all sprites face right by default
+		direction = (sprite.flipX) ? -1 : 1;
 	}
 
 	public void Flip()	//TODO this should probably be its own script
 	{
-		Vector3 theScale = transform.localScale;
-		theScale.x *= -1;
-		transform.localScale = theScale;
-		facingRight = !facingRight;
+		sprite.flipX = !sprite.flipX;
+		direction = (sprite.flipX) ? -1 : 1;
 	}
 
 	/*
@@ -26,7 +32,7 @@ public class FlipSprite : MonoBehaviour {
 	 * */
 	public void FaceDir(bool right)
 	{
-		if(facingRight != right)
+		if((direction == 1) != right)
 		{
 			Flip();
 		}
