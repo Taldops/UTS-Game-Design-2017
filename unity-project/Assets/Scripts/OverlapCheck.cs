@@ -5,12 +5,13 @@ using UnityEngine;
 public class OverlapCheck : MonoBehaviour {
 
 	[HideInInspector] public bool overlaps;
-	public int mask = 0;
+	public string[] tagList;
 
 	public bool showDetector;
 
 	private Transform topLeft;
 	private Transform bottomRight;
+	private int mask;
 
 	void Awake()
 	{
@@ -20,7 +21,7 @@ public class OverlapCheck : MonoBehaviour {
 		bottomRight.parent = transform;
 		topLeft.position = (Vector2) this.transform.position - (0.5f * Vector2.Scale(GetComponent<BoxCollider2D>().size, (Vector2) transform.lossyScale));
 		bottomRight.position = (Vector2) this.transform.position + (0.5f * Vector2.Scale(GetComponent<BoxCollider2D>().size, (Vector2) transform.lossyScale));
-		mask = (mask == 0) ? LayerMask.GetMask("Ground") : mask;
+		mask = LayerMask.GetMask(tagList);
 	}
 
 	void Update()
