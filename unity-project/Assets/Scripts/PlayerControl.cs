@@ -58,6 +58,7 @@ public class PlayerControl : MonoBehaviour {
 	float currentInputJump;		//current horizontal input
 	AnimatorStateInfo currentState;
 	float gravMem;	//stores original rigidbody.gravityscale
+	float vCheckX;	//Stores original x cooridinate of vaultCheck
 
 	//For Walljumps:
 	private Vector2 incomingVelocity = Vector2.zero;
@@ -90,6 +91,7 @@ public class PlayerControl : MonoBehaviour {
 		vaultState = Animator.StringToHash("Base Layer.Vault");
 
 		gravMem = rigid.gravityScale;
+		vCheckX = vaultCheck.transform.localPosition.x;
 	}
 
 	// Update is called once per frame
@@ -98,6 +100,7 @@ public class PlayerControl : MonoBehaviour {
 		currentInputJump = Input.GetAxis("Jump");
 		currentState = anim.GetCurrentAnimatorStateInfo(0);
 		windowTimer -= Time.deltaTime;
+		vaultCheck.transform.localPosition = new Vector3 (flipper.direction * vCheckX, vaultCheck.transform.localPosition.y, vaultCheck.transform.localPosition.z);
 
 		//Parameter update
 		anim.SetBool("Grounded", groundCheck.overlaps);
