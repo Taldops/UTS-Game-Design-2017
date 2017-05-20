@@ -799,7 +799,13 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 114927817680365544, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: maxSlideJumpSpeedFactor
+      value: 1.3
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 114037296623047676, guid: f82a7a572171473468a1ee2333887480, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: f82a7a572171473468a1ee2333887480, type: 2}
   m_IsPrefabParent: 0
 --- !u!1001 &533032133

@@ -25,6 +25,7 @@ public class PlayerControl : MonoBehaviour {
 	public float slideThresh = 14.0f;	//How fast you need to go to slide
 	public float slideBoost	= 800;		//Speedboost for slide start
 	public float slideBreak = 2;		//How fast you lose speed while sliding
+	public float maxSlideJumpSpeedFactor = 1.3f; //How much of the normal max speed can be reached with a slideJump
 	public Vector2 vaultImpulse = new Vector2(200, 600);	//Fore that gets applied when a vault is performed
 
 	//reference shorthand
@@ -112,7 +113,6 @@ public class PlayerControl : MonoBehaviour {
 			if(Input.GetButtonDown("Jump"))
 			{
 				jumping = true;
-				anim.SetTrigger("Jump");
 			}
 		}
 
@@ -152,7 +152,6 @@ public class PlayerControl : MonoBehaviour {
 			&& Input.GetButtonDown("Action"))															//Input for either
 		{
 			action = true;
-			anim.SetTrigger("Action");
 		}
 		//Dive orientation
 		if(currentState.fullPathHash == diveState)
@@ -174,10 +173,16 @@ public class PlayerControl : MonoBehaviour {
 		//Ground Movement
 		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState || currentState.fullPathHash == slideState)
 		{
-			if(jumping)
+			if(jumping
+				&& (currentState.fullPathHash != slideState || Mathf.Abs(rigid.velocity.x) <= maxSpeed * maxSlideJumpSpeedFactor)) //Prevent immediate jumpout
 			{
-				// Make sure the player can't jump again until the jump conditions from Update are satisfied.
+				/* BUG:
+				 * The above condition doesn't work as intended, because somhow the current state is still running EVEN THOUGH YOU CAN SEE THE SPRITE SLIDING. 
+				 * Even the extended condition in the next line doesn't work. Thus you can jump out of slide immediately by pressing Action and Jump at the same time.
+				 * TODO Fix if possible*/
+				//print("WAT: " + (currentState.fullPathHash != slideState && !anim.GetBool("Action") && !anim.IsInTransition(0)));
 				jumping = false;
+				anim.SetTrigger("Jump");
 				GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, jumpForce));
 				if(currentState.fullPathHash == skidState)
 				{	
@@ -191,6 +196,7 @@ public class PlayerControl : MonoBehaviour {
 			{
 				action = false;
 				rigid.AddForce(Vector2.right * (flipper.direction * slideBoost));
+				anim.SetTrigger("Action");
 			}
 
 			//Friction
@@ -240,6 +246,7 @@ public class PlayerControl : MonoBehaviour {
 			{
 				//Commence dive
 				rigid.velocity = new Vector2(flipper.direction * Mathf.Max(Mathf.Abs(rigid.velocity.x), maxSpeed) , rigid.velocity.y);
+				anim.SetTrigger("Action");
 				action = false;
 				vault = true;
 			}
