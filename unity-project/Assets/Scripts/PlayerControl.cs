@@ -176,6 +176,7 @@ public class PlayerControl : MonoBehaviour {
 		//Ground Movement
 		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState || currentState.fullPathHash == slideState)
 		{
+			body.transform.up = Vector3.up;
 			if(jumping
 				&& (currentState.fullPathHash != slideState || Mathf.Abs(rigid.velocity.x) <= maxSpeed * maxSlideJumpSpeedFactor)) //Prevent immediate jumpout
 			{
