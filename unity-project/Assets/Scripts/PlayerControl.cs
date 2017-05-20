@@ -25,6 +25,7 @@ public class PlayerControl : MonoBehaviour {
 	public float slideThresh = 14.0f;	//How fast you need to go to slide
 	public float slideBoost	= 800;		//Speedboost for slide start
 	public float slideBreak = 2;		//How fast you lose speed while sliding
+	public Vector2 vaultImpulse = new Vector2(200, 600);	//Fore that gets applied when a vault is performed
 
 	//reference shorthand
 	private Animator anim;
@@ -33,6 +34,7 @@ public class PlayerControl : MonoBehaviour {
 	private GameObject body;
 	private OverlapCheck groundCheck;
 	private OverlapCheck[] wallChecks;
+	private OverlapCheck vaultCheck;
 
 	//Animation State Hashes:
 	int idleState;
@@ -45,10 +47,12 @@ public class PlayerControl : MonoBehaviour {
 	int slideState;
 	int diveState;
 	int rollState;
+	int vaultState;
 
 	//internal state
 	bool jumping = false;	//keep track of jumoing
 	bool action = false;	//keep track of sliding and diving
+	bool vault = false;		//has the vault impulse been applied yet?
 	float currentInputMove;		//current horizontal input
 	float currentInputJump;		//current horizontal input
 	AnimatorStateInfo currentState;
@@ -69,6 +73,7 @@ public class PlayerControl : MonoBehaviour {
 		wallChecks = new OverlapCheck[2];
 		wallChecks[0]= transform.FindChild("WallCheck1").GetComponent<OverlapCheck>();
 		wallChecks[1] = transform.FindChild("WallCheck2").GetComponent<OverlapCheck>();
+		vaultCheck = transform.FindChild("VaultCheck").GetComponent<OverlapCheck>();
 
 		//Animation state setup
 		idleState = Animator.StringToHash("Base Layer.Idle");
@@ -81,10 +86,11 @@ public class PlayerControl : MonoBehaviour {
 		slideState = Animator.StringToHash("Base Layer.Slide");
 		diveState = Animator.StringToHash("Base Layer.Dive");
 		rollState = Animator.StringToHash("Base Layer.Roll");
+		vaultState = Animator.StringToHash("Base Layer.Vault");
 
 		gravMem = rigid.gravityScale;
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		currentInputMove = Input.GetAxisRaw("Horizontal");
@@ -98,6 +104,7 @@ public class PlayerControl : MonoBehaviour {
 		anim.SetFloat("SpeedY", rigid.velocity.y);
 		anim.SetInteger("Input", (int) currentInputMove);
 		anim.SetBool("DirAlign", currentInputMove * rigid.velocity.x >= 0);
+		anim.SetBool("CouldVault", !vaultCheck.overlaps);
 
 		//Jumping:
 		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState || currentState.fullPathHash == slideState)
@@ -113,6 +120,16 @@ public class PlayerControl : MonoBehaviour {
 		if(currentState.fullPathHash == runState && rigid.velocity.x != 0)
 		{
 			flipper.FaceDir(rigid.velocity.x > 0);
+		}
+
+		//Rotating towards neutral
+		if(currentState.fullPathHash == vaultState || currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState)
+		{
+			Vector3 from = flipper.direction * body.transform.right;
+
+			print(from);
+			Vector3 to = Vector3.right * flipper.direction;
+			body.transform.right = flipper.direction * Vector3.Slerp(from, to, 4 * currentState.speed * Time.deltaTime);
 		}
 
 		//Test for Walljump
@@ -144,11 +161,11 @@ public class PlayerControl : MonoBehaviour {
 		{
 			body.transform.right = flipper.direction * rigid.velocity + 0.1f * flipper.direction * Vector2.right;
 		}
-		//Rolling after diving resets orientation and action status
+		//Rolling after diving resets orientation and vault status
 		if(currentState.fullPathHash == rollState)
 		{
 			body.transform.up = Vector3.up;
-			action = false;
+			vault = false;
 		}
 	}
 
@@ -200,7 +217,7 @@ public class PlayerControl : MonoBehaviour {
 		}
 
 		//Air Movement
-		if(currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState || currentState.fullPathHash == backflipState)
+		if(currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState || currentState.fullPathHash == backflipState || currentState.fullPathHash == vaultState)
 		{
 			if(Mathf.Abs(rigid.velocity.x) < maxAirAccel || currentInputMove * rigid.velocity.x <= 0)
 			{
@@ -223,6 +240,13 @@ public class PlayerControl : MonoBehaviour {
 			{
 				//Commence dive
 				rigid.velocity = new Vector2(flipper.direction * Mathf.Max(Mathf.Abs(rigid.velocity.x), maxSpeed) , rigid.velocity.y);
+				action = false;
+				vault = true;
+			}
+			if(currentState.fullPathHash == vaultState && vault)
+			{
+				vault = false;
+				rigid.AddForce(vaultImpulse);
 			}
 		}
 
