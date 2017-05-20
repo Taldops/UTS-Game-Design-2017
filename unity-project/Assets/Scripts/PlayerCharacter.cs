@@ -3,14 +3,30 @@ using System.Collections;
 
 public class PlayerCharacter : MonoBehaviour {
 	private int _health;
+	private int _points;
+	private float invincibleTime = 1;
+	private float timeTillHurt = 0;
 
 	void Start() {
 		_health = 5;
+		_points = 0;
+	}
+	
+	void Update(){
+		timeTillHurt -= Time.deltaTime;
 	}
 
 	public void Hurt(int damage) {
+		if(timeTillHurt <= 0){
 		_health -= damage;
-		Debug.Log("Health: " + _health);
+		 timeTillHurt = invincibleTime;
+		}
+		//Debug.Log("Health: " + _health);
+	}
+	
+	public void getPoints(int value) {
+		_points += value;
+		//Debug.Log("Health: " + _health);
 	}
 	
 	void OnGUI()
@@ -24,7 +40,7 @@ public class PlayerCharacter : MonoBehaviour {
 		style.alignment = TextAnchor.LowerRight;
 		style.fontSize = Mathf.RoundToInt(2 * h * 0.02f);
 		//style.normal.textColor = (windowTimer > 0) ? new Color (0.2f, 0.9f, 0.2f, 1.0f) : new Color (0.3f, 0.4f, 0.3f, 1.0f);
-		string text = "Health: " + _health;
+		string text = "Health: " + _health + " Score: " + _points;
 		GUI.Label(rect, text, style);
 	}
 }
