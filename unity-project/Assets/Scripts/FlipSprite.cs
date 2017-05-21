@@ -1,5 +1,6 @@
 ﻿/*
  * Mirrors the Sprite horizontally
+ * Uses transform.scale instead of SpriteRenderer.flipX because of animaion collider adjustments
  * */
 
 using System.Collections;
@@ -8,22 +9,20 @@ using UnityEngine;
 
 public class FlipSprite : MonoBehaviour {
 
-	[HideInInspector]
-	public float direction;	//1: facing right, -1: facing left
-
-	private SpriteRenderer sprite;
+	[HideInInspector] public float direction;	//1: facing right, -1: facing left
 
 	public void Awake()
 	{
-		sprite = GetComponent<SpriteRenderer>();
 		//It assumes all sprites face right by default
-		direction = (sprite.flipX) ? -1 : 1;
+		direction = Mathf.Sign(transform.localScale.x);
 	}
 
 	public void Flip()	//TODO this should probably be its own script
 	{
-		sprite.flipX = !sprite.flipX;
-		direction = (sprite.flipX) ? -1 : 1;
+		Vector3 theScale = transform.localScale;
+		theScale.x *= -1;
+		transform.localScale = theScale;
+		direction = Mathf.Sign(transform.localScale.x);
 	}
 
 	/*
