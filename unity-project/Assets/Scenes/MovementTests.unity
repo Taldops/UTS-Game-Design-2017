@@ -834,6 +834,33 @@ Prefab:
       propertyPath: tagList.Array.data[1]
       value: Enemy
       objectReference: {fileID: 0}
+    - target: {fileID: 1764409733803758, guid: f82a7a572171473468a1ee2333887480, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1007369212043144, guid: f82a7a572171473468a1ee2333887480, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821494386117628, guid: f82a7a572171473468a1ee2333887480, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114927817680365544, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: vaultImpulse.y
+      value: 400
+      objectReference: {fileID: 0}
+    - target: {fileID: 114927817680365544, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: vaultImpulse.x
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 114927817680365544, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: groundCheckHeight
+      value: 0.75
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114037296623047676, guid: f82a7a572171473468a1ee2333887480, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: f82a7a572171473468a1ee2333887480, type: 2}

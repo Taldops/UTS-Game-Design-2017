@@ -28,6 +28,9 @@ public class PlayerControl : MonoBehaviour {
 	public float maxSlideJumpSpeedFactor = 1.3f; //How much of the normal max speed can be reached with a slideJump
 	public Vector2 vaultImpulse = new Vector2(200, 600);	//Fore that gets applied when a vault is performed
 
+	//Other parameters
+	public float groundCheckHeight = 1;
+
 	//reference shorthand
 	private Animator anim;
 	private Rigidbody2D rigid;
@@ -100,9 +103,32 @@ public class PlayerControl : MonoBehaviour {
 		currentInputJump = Input.GetAxis("Jump");
 		currentState = anim.GetCurrentAnimatorStateInfo(0);
 		windowTimer -= Time.deltaTime;
-		vaultCheck.transform.localPosition = new Vector3 (flipper.direction * vCheckX, vaultCheck.transform.localPosition.y, vaultCheck.transform.localPosition.z);
 
-		//Parameter update
+		//Updating Checks
+		Vector3 vcPos = vaultCheck.transform.localPosition;
+		vaultCheck.transform.localPosition = new Vector3 (flipper.direction * vCheckX, vcPos.y, vcPos.z);
+		BoxCollider2D bodyColl = body.GetComponent<BoxCollider2D>();
+		Vector3 collCenter = body.transform.localPosition + new Vector3 (bodyColl.offset.x * flipper.direction, bodyColl.offset.y, 0);
+		Vector3 pointToPos;
+		float xCross;
+		float sizeY;
+		//TODO Refactor this if construction
+		if((- body.transform.up * bodyColl.size.y).y < (body.transform.right * bodyColl.size.x).y * flipper.direction)
+		{
+			pointToPos = - body.transform.up * bodyColl.size.y * 0.5f;
+			xCross = Mathf.Abs((body.transform.right * bodyColl.size.x).x);
+			sizeY = groundCheckHeight + 0.3f * bodyColl.size.x * Mathf.Clamp01(1 - Mathf.Abs(45 - Mathf.Abs(getRotation()))/45);
+		}
+		else
+		{
+			pointToPos = body.transform.right * flipper.direction * bodyColl.size.x * 0.5f;
+			xCross = Mathf.Abs((- body.transform.up * bodyColl.size.y).x);
+			sizeY = groundCheckHeight + 0.3f * bodyColl.size.y * Mathf.Clamp01(1 - Mathf.Abs(45 - Mathf.Abs(getRotation()))/45);
+		}
+		groundCheck.transform.localPosition = collCenter + pointToPos;// new Vector3(pointToPos.x * flipper.direction, pointToPos.y, pointToPos.z);
+		groundCheck.gameObject.GetComponent<BoxCollider2D>().size = new Vector2 (xCross, sizeY);
+
+		//Animation Parameter update
 		anim.SetBool("Grounded", groundCheck.overlaps);
 		anim.SetFloat("SpeedX", Mathf.Abs(rigid.velocity.x));
 		anim.SetFloat("SpeedY", rigid.velocity.y);
@@ -298,6 +324,11 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
+	private float getRotation()
+	{
+		float angle = body.transform.eulerAngles.z;
+		return (angle < 180) ? angle : angle - 360;
+	}
 	/*
 	// For Debugging:
 	void OnGUI()
