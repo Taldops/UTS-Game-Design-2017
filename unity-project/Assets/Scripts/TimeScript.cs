@@ -20,10 +20,18 @@ public class TimeScript : MonoBehaviour {
 		if(Input.GetKeyDown(slower))
 		{
 			Time.timeScale *= 0.5f;
+			if (Time.timeScale == 0)
+			{
+				lastScale *= 0.5f;
+			}
 		}
 		if(Input.GetKeyDown(faster))
 		{
 			Time.timeScale *= 2.0f;
+			if (Time.timeScale == 0)
+			{
+				lastScale *= 2f;
+			}
 		}
 		if(Input.GetKeyDown(normal))
 		{

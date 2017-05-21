@@ -19,14 +19,13 @@ public class OverlapCheck : MonoBehaviour {
 		bottomRight = new GameObject().transform;
 		topLeft.parent = transform;
 		bottomRight.parent = transform;
-		topLeft.position = (Vector2) this.transform.position - (0.5f * Vector2.Scale(GetComponent<BoxCollider2D>().size, (Vector2) transform.lossyScale));
-		bottomRight.position = (Vector2) this.transform.position + (0.5f * Vector2.Scale(GetComponent<BoxCollider2D>().size, (Vector2) transform.lossyScale));
 		mask = LayerMask.GetMask(tagList);
 	}
 
 	void Update()
 	{
 		//Having it here instead of in fixed update makes it more precise?
+		updateArea();
 		overlaps = Physics2D.OverlapArea(topLeft.position, bottomRight.position, mask);
 		if(showDetector)
 		{

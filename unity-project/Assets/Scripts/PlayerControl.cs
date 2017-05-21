@@ -61,7 +61,7 @@ public class PlayerControl : MonoBehaviour {
 	float currentInputJump;		//current horizontal input
 	AnimatorStateInfo currentState;
 	float gravMem;	//stores original rigidbody.gravityscale
-	float vCheckX;	//Stores original x cooridinate of vaultCheck
+	Vector3 vcPos;	//Stores position of vault detector
 
 	//For Walljumps:
 	private Vector2 incomingVelocity = Vector2.zero;
@@ -94,7 +94,7 @@ public class PlayerControl : MonoBehaviour {
 		vaultState = Animator.StringToHash("Base Layer.Vault");
 
 		gravMem = rigid.gravityScale;
-		vCheckX = vaultCheck.transform.localPosition.x;
+		vcPos = vaultCheck.transform.localPosition;
 	}
 
 	// Update is called once per frame
@@ -105,8 +105,7 @@ public class PlayerControl : MonoBehaviour {
 		windowTimer -= Time.deltaTime;
 
 		//Updating Checks
-		Vector3 vcPos = vaultCheck.transform.localPosition;
-		vaultCheck.transform.localPosition = new Vector3 (flipper.direction * vCheckX, vcPos.y, vcPos.z);
+		vaultCheck.transform.localPosition = 0.1f * rigid.velocity; //new Vector3 (flipper.direction * vcPos.x, -Mathf.Sign(rigid.velocity.y) * vcPos.y, vcPos.z);
 		BoxCollider2D bodyColl = body.GetComponent<BoxCollider2D>();
 		Vector3 collCenter = body.transform.localPosition + new Vector3 (bodyColl.offset.x * flipper.direction, bodyColl.offset.y, 0);
 		Vector3 pointToPos;
@@ -117,16 +116,21 @@ public class PlayerControl : MonoBehaviour {
 		{
 			pointToPos = - body.transform.up * bodyColl.size.y * 0.5f;
 			xCross = Mathf.Abs((body.transform.right * bodyColl.size.x).x);
-			sizeY = groundCheckHeight + 0.3f * bodyColl.size.x * Mathf.Clamp01(1 - Mathf.Abs(45 - Mathf.Abs(getRotation()))/45);
+			sizeY = groundCheckHeight + 0.5f * bodyColl.size.x * Mathf.Clamp01(1 - Mathf.Abs(45 - Mathf.Abs(getRotation()))/45);
 		}
 		else
 		{
 			pointToPos = body.transform.right * flipper.direction * bodyColl.size.x * 0.5f;
 			xCross = Mathf.Abs((- body.transform.up * bodyColl.size.y).x);
-			sizeY = groundCheckHeight + 0.3f * bodyColl.size.y * Mathf.Clamp01(1 - Mathf.Abs(45 - Mathf.Abs(getRotation()))/45);
+			sizeY = groundCheckHeight + 0.5f * bodyColl.size.y * Mathf.Clamp01(1 - Mathf.Abs(45 - Mathf.Abs(getRotation()))/45);
 		}
 		groundCheck.transform.localPosition = collCenter + pointToPos;// new Vector3(pointToPos.x * flipper.direction, pointToPos.y, pointToPos.z);
-		groundCheck.gameObject.GetComponent<BoxCollider2D>().size = new Vector2 (xCross, sizeY);
+		groundCheck.gameObject.GetComponent<BoxCollider2D>().size = new Vector2 (xCross * 0.8f, sizeY);
+		//Wallchecks
+		wallChecks[0].transform.localPosition = collCenter + 0.5f * bodyColl.size.x * Vector3.right;
+		wallChecks[1].transform.localPosition = collCenter - 0.5f * bodyColl.size.x * Vector3.right;
+		wallChecks[0].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(bodyColl.size.x * groundCheckHeight * 0.5f, bodyColl.size.y * 0.6f);
+		wallChecks[1].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(bodyColl.size.x * groundCheckHeight * 0.5f, bodyColl.size.y * 0.6f);
 
 		//Animation Parameter update
 		anim.SetBool("Grounded", groundCheck.overlaps);
