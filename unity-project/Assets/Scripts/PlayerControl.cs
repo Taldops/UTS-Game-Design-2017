@@ -38,7 +38,7 @@ public class PlayerControl : MonoBehaviour {
 	private GameObject body;
 	private OverlapCheck groundCheck;
 	private OverlapCheck[] wallChecks;
-	private OverlapCheck vaultCheck;
+	private OverlapCircle vaultCheck;
 
 	//Animation State Hashes:
 	int idleState;
@@ -78,7 +78,7 @@ public class PlayerControl : MonoBehaviour {
 		wallChecks = new OverlapCheck[2];
 		wallChecks[0]= transform.FindChild("WallCheck1").GetComponent<OverlapCheck>();
 		wallChecks[1] = transform.FindChild("WallCheck2").GetComponent<OverlapCheck>();
-		vaultCheck = transform.FindChild("VaultCheck").GetComponent<OverlapCheck>();
+		vaultCheck = transform.FindChild("VaultCheck").GetComponent<OverlapCircle>();
 
 		//Animation state setup
 		idleState = Animator.StringToHash("Base Layer.Idle");
@@ -105,7 +105,7 @@ public class PlayerControl : MonoBehaviour {
 		windowTimer -= Time.deltaTime;
 
 		//Updating Checks
-		vaultCheck.transform.localPosition = 0.1f * rigid.velocity; //new Vector3 (flipper.direction * vcPos.x, -Mathf.Sign(rigid.velocity.y) * vcPos.y, vcPos.z);
+		vaultCheck.transform.localPosition = 0.075f * rigid.velocity + Vector2.down; //new Vector3 (flipper.direction * vcPos.x, -Mathf.Sign(rigid.velocity.y) * vcPos.y, vcPos.z);
 		BoxCollider2D bodyColl = body.GetComponent<BoxCollider2D>();
 		Vector3 collCenter = body.transform.localPosition + new Vector3 (bodyColl.offset.x * flipper.direction, bodyColl.offset.y, 0);
 		Vector3 pointToPos;
@@ -160,7 +160,7 @@ public class PlayerControl : MonoBehaviour {
 		{
 			Vector3 from = flipper.direction * body.transform.right;
 			Vector3 to = Vector3.right * flipper.direction;
-			body.transform.right = flipper.direction * Vector3.Slerp(from, to, 4 * currentState.speed * Time.deltaTime);
+			body.transform.right = flipper.direction * Vector3.Slerp(from, to, 4 * currentState.speed * Time.deltaTime * 2.0f);
 		}
 
 		//Test for Walljump
