@@ -143,6 +143,7 @@ public class PlayerControl : MonoBehaviour {
 		anim.SetInteger("Input", (int) currentInputMove);
 		anim.SetBool("DirAlign", currentInputMove * rigid.velocity.x >= 0);
 		anim.SetBool("CouldVault", !vaultCheck.overlaps);
+		anim.SetFloat("SpeedMod", Mathf.Abs(rigid.velocity.x)/maxSpeed);
 
 		//Jumping:
 		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState || currentState.fullPathHash == slideState)
