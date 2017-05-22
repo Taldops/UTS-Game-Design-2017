@@ -27,6 +27,7 @@ public class PlayerControl : MonoBehaviour {
 	public float slideBreak = 2;		//How fast you lose speed while sliding
 	public float maxSlideJumpSpeedFactor = 1.3f; //How much of the normal max speed can be reached with a slideJump
 	public Vector2 vaultImpulse = new Vector2(200, 600);	//Fore that gets applied when a vault is performed
+	public float bonkBounceFactor = 1.3f;
 
 	//Other parameters
 	public float groundCheckHeight = 1;
@@ -52,6 +53,7 @@ public class PlayerControl : MonoBehaviour {
 	int diveState;
 	int rollState;
 	int vaultState;
+	int bonkState;
 
 	//internal state
 	bool jumping = false;	//keep track of jumoing
@@ -62,6 +64,7 @@ public class PlayerControl : MonoBehaviour {
 	AnimatorStateInfo currentState;
 	float gravMem;	//stores original rigidbody.gravityscale
 	Vector3 vcPos;	//Stores position of vault detector
+	bool bonked = false;
 
 	//For Walljumps:
 	private Vector2 incomingVelocity = Vector2.zero;
@@ -92,6 +95,7 @@ public class PlayerControl : MonoBehaviour {
 		diveState = Animator.StringToHash("Base Layer.Dive");
 		rollState = Animator.StringToHash("Base Layer.Roll");
 		vaultState = Animator.StringToHash("Base Layer.Vault");
+		bonkState = Animator.StringToHash("Base Layer.Bonk");
 
 		gravMem = rigid.gravityScale;
 		vcPos = vaultCheck.transform.localPosition;
@@ -129,8 +133,8 @@ public class PlayerControl : MonoBehaviour {
 		//Wallchecks
 		wallChecks[0].transform.localPosition = collCenter + 0.5f * bodyColl.size.x * Vector3.right;
 		wallChecks[1].transform.localPosition = collCenter - 0.5f * bodyColl.size.x * Vector3.right;
-		wallChecks[0].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(bodyColl.size.x * groundCheckHeight * 0.5f, bodyColl.size.y * 0.6f);
-		wallChecks[1].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(bodyColl.size.x * groundCheckHeight * 0.5f, bodyColl.size.y * 0.6f);
+		wallChecks[0].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(bodyColl.size.x * groundCheckHeight * 0.55f, bodyColl.size.y * 0.6f);
+		wallChecks[1].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(bodyColl.size.x * groundCheckHeight * 0.55f, bodyColl.size.y * 0.6f);
 
 		//Animation Parameter update
 		anim.SetBool("Grounded", groundCheck.overlaps);
@@ -156,7 +160,7 @@ public class PlayerControl : MonoBehaviour {
 		}
 
 		//Rotating towards neutral
-		if(currentState.fullPathHash == vaultState || currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState)
+		if(currentState.fullPathHash == vaultState || currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState || currentState.fullPathHash == bonkState)
 		{
 			Vector3 from = flipper.direction * body.transform.right;
 			Vector3 to = Vector3.right * flipper.direction;
@@ -166,6 +170,7 @@ public class PlayerControl : MonoBehaviour {
 		//Test for Walljump
 		int frontCheck = (flipper.direction * (wallChecks[0].gameObject.transform.position.x - transform.position.x) > 0) ? 0 : 1;
 		bool wallCollision = (wallChecks[frontCheck].overlaps && rigid.velocity.x * flipper.direction > 0) || (wallChecks[1 - frontCheck].overlaps && rigid.velocity.x * flipper.direction < 0);
+		anim.SetBool("WallTouch", wallChecks[frontCheck].overlaps);
 		if((currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState || currentState.fullPathHash == backflipState)
 			&& wallCollision && Mathf.Abs(rigid.velocity.x) >= velocityThresh && (windowTimer < 0 || Mathf.Abs(rigid.velocity.x) > Mathf.Abs(incomingVelocity.x)))
 		{
@@ -182,7 +187,7 @@ public class PlayerControl : MonoBehaviour {
 		//Sliding
 		if(((currentState.fullPathHash == runState && Mathf.Abs(rigid.velocity.x) > slideThresh)		//Sliding conditions
 			|| (currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState))			//Diving conditions
-			&& Input.GetButtonDown("Action"))															//Input for either
+			&& Input.GetButtonDown("Action") && !wallChecks[frontCheck].overlaps)															//Input for either
 		{
 			action = true;
 		}
@@ -325,6 +330,19 @@ public class PlayerControl : MonoBehaviour {
 			{
 				flipper.FaceDir(rigid.velocity.x > 0);
 			}
+		}
+
+		//Bonking
+		if(currentState.fullPathHash == bonkState && !bonked)
+		{
+			//rigid.AddForce(-flipper.direction * new Vector2(bonkBounceFactor * maxSpeed, 0), ForceMode2D.Impulse);	//leads to errors
+			rigid.velocity = new Vector2(-rigid.velocity.x * bonkBounceFactor * 0.3f, rigid.velocity.y);
+			bonked = true;
+			print("bonk");
+		}
+		if(currentState.fullPathHash == idleState)
+		{
+			bonked = false;
 		}
 	}
 
