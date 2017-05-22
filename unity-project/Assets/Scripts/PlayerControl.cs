@@ -212,14 +212,9 @@ public class PlayerControl : MonoBehaviour {
 		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState || currentState.fullPathHash == slideState)
 		{
 			body.transform.up = Vector3.up;
-			if(jumping
+			if(jumping && !action && !anim.GetBool("Action")
 				&& (currentState.fullPathHash != slideState || Mathf.Abs(rigid.velocity.x) <= maxSpeed * maxSlideJumpSpeedFactor)) //Prevent immediate jumpout
 			{
-				/* BUG:
-				 * The above condition doesn't work as intended, because somhow the current state is still running EVEN THOUGH YOU CAN SEE THE SPRITE SLIDING. 
-				 * Even the extended condition in the next line doesn't work. Thus you can jump out of slide immediately by pressing Action and Jump at the same time.
-				 * TODO Fix if possible*/
-				//print("WAT: " + (currentState.fullPathHash != slideState && !anim.GetBool("Action") && !anim.IsInTransition(0)));
 				jumping = false;
 				anim.SetTrigger("Jump");
 				GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, jumpForce));
