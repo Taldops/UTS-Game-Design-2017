@@ -985,6 +985,36 @@ Prefab:
       propertyPath: tagList.Array.data[1]
       value: Enemy
       objectReference: {fileID: 0}
+    - target: {fileID: 114531564352031376, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: _health
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114531564352031376, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: screenPositionX
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114531564352031376, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: screenPositionY
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114531564352031376, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: iconSizeX
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 114531564352031376, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: iconSizeY
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 114531564352031376, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: _healthTexture
+      value: 
+      objectReference: {fileID: 2800000, guid: 0ec3136b85d3a9a4e91212884a5aee3f, type: 3}
     m_RemovedComponents:
     - {fileID: 114037296623047676, guid: f82a7a572171473468a1ee2333887480, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: f82a7a572171473468a1ee2333887480, type: 2}
