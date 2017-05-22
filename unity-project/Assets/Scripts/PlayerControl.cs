@@ -20,6 +20,11 @@ public class PlayerControl : MonoBehaviour {
 	public float wjAnglePenalty	= 0.6f;	//0: Walljump forcce does not depend on incoming angle, 1: no force when coming in at 90deg
 	public float jumpWindow = 0.3f; //Time the player has for doing a walljump after collision
 	public float velocityThresh = 6.0f; //minimum velocity required for a walljump. LESS THAN 1 BREAKS THE WALLJUMP
+	public float wjForce = 0.8f;
+	public float wjGrace = 0.1f;
+	public float wjMinUp = 2.0f;
+	public float wjMaxX = 1.7f;
+	public float wjOutAngleBonus = 0.25f;
 
 	//Action parameters:
 	public float slideThresh = 14.0f;	//How fast you need to go to slide
@@ -65,9 +70,12 @@ public class PlayerControl : MonoBehaviour {
 	float gravMem;	//stores original rigidbody.gravityscale
 	Vector3 vcPos;	//Stores position of vault detector
 	bool bonked = false;
+	Vector2 wjVelCache = Vector2.zero;
+	Vector2 wjIn = Vector2.zero;	//TODO Refactor so that this isn't needed and Cahe is used instead
+	float wjCacheAge;
 
 	//For Walljumps:
-	private Vector2 incomingVelocity = Vector2.zero;
+	//private Vector2 incomingVelocity = Vector2.zero;
 	private float windowTimer = 0;
 
 
@@ -148,7 +156,7 @@ public class PlayerControl : MonoBehaviour {
 		//Jumping:
 		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState || currentState.fullPathHash == slideState)
 		{
-			if(Input.GetButtonDown("Jump"))
+			if(Input.GetButtonDown("Jump") && groundCheck.overlaps)
 			{
 				jumping = true;
 			}
@@ -168,20 +176,51 @@ public class PlayerControl : MonoBehaviour {
 			body.transform.right = flipper.direction * Vector3.Slerp(from, to, 4 * currentState.speed * Time.deltaTime * 2.0f);
 		}
 
-		//Test for Walljump
+		//Walljump
+		//Velocity Cache
+		if(Mathf.Abs(rigid.velocity.x) > Mathf.Abs(wjVelCache.x) && currentState.fullPathHash != walljumpState)
+		{
+			wjVelCache = new Vector2(rigid.velocity.x, wjVelCache.y);
+		}
+		if(Mathf.Abs(rigid.velocity.y) > Mathf.Abs(wjVelCache.y) && currentState.fullPathHash != walljumpState)
+		{
+			wjVelCache = new Vector2(wjVelCache.x, Mathf.Clamp(Mathf.Max(rigid.velocity.y, wjVelCache.y), -30, 22));
+		}
+		if(wjCacheAge > wjGrace)
+		{
+			wjVelCache = rigid.velocity;
+			wjCacheAge = 0;
+		}
+		/*
+		if((Mathf.Abs(rigid.velocity.x) > Mathf.Abs(wjVelCache.x) || wjCacheAge > wjGrace)
+			&& currentState.fullPathHash != walljumpState)
+		{
+			float newY = 0;
+			if(wjCacheAge > wjGrace)
+			{
+				newY = rigid.velocity.y;
+			}
+			else
+			{
+				newY = Mathf.Clamp(Mathf.Max(rigid.velocity.y, wjVelCache.y), -30, 22);
+			}
+			wjVelCache = new Vector2(rigid.velocity.x, newY);
+			wjCacheAge = 0;
+		}
+		*/
+		wjCacheAge += Time.deltaTime;
+		//Jump check
 		int frontCheck = (flipper.direction * (wallChecks[0].gameObject.transform.position.x - transform.position.x) > 0) ? 0 : 1;
 		bool wallCollision = (wallChecks[frontCheck].overlaps && rigid.velocity.x * flipper.direction > 0) || (wallChecks[1 - frontCheck].overlaps && rigid.velocity.x * flipper.direction < 0);
 		anim.SetBool("WallTouch", wallChecks[frontCheck].overlaps);
 		if((currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState || currentState.fullPathHash == backflipState)
-			&& wallCollision && Mathf.Abs(rigid.velocity.x) >= velocityThresh && (windowTimer < 0 || Mathf.Abs(rigid.velocity.x) > Mathf.Abs(incomingVelocity.x)))
+			&& wallCollision && Mathf.Abs(wjVelCache.x) >= velocityThresh && wjCacheAge < wjGrace
+			&& currentInputJump > 0
+			&& !anim.GetBool("Jump")
+			&& !jumping)
 		{
-			windowTimer = jumpWindow;
-			incomingVelocity = rigid.velocity;
-			if(windowTimer >= 0 && currentInputJump > 0)
-			{
-				anim.SetTrigger("Jump");
-				windowTimer = -1;
-			}
+			anim.SetTrigger("Jump");
+			wjIn = wjVelCache;
 		}
 
 		//Action States
@@ -299,38 +338,47 @@ public class PlayerControl : MonoBehaviour {
 
 		//Walljump TODO
 		/*
-		 * Make bad Walljumps better (minimum outgoing x and y speed?)
-		 * change angle calculation to allow for more horizontal jumps
-		 * make maximum vertical jumps worse?
-		 * Give bonus to away jumps?
+		 * Better magnatiziation towards walls
+		 * Fix VISUAL BUG: Walljumps on walls on the right oush the player out while the animation is playing
 		 */
 		if(currentState.fullPathHash == walljumpState)
 		{
 			jumping = true;
 			rigid.gravityScale = 0;
-			rigid.velocity = new Vector2(flipper.direction * 0, rigid.velocity.y * 0.5f);
-			flipper.FaceDir(incomingVelocity.x > 0);
+			rigid.velocity = new Vector2(flipper.direction * 10, rigid.velocity.y * 0.5f);	//dangerous
+			//rigid.velocity = new Vector2(rigid.velocity.x, rigid.velocity.y * 0.5f);
+			//transform.position += new Vector3(transform.localScale * flipper.direction);
+			flipper.FaceDir(wjIn.x > 0);
 		}
 		else
 		{
 			rigid.gravityScale = gravMem;
 		}
-		if((currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState) && jumping)
+		if((currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState) && jumping && wjIn.sqrMagnitude > 1)
 		{
+			Vector2 incomingVelocity = new Vector2(wjIn.x, Mathf.Max(rigid.velocity.y, wjIn.y));
 			float angleFactor = 0.5f * (currentInputMove * Mathf.Sign(incomingVelocity.x) + 1);	//1 means up, 0 means 45 degrees
-			Vector2 jumpvec = (Vector2) Vector3.Slerp(new Vector3(-Mathf.Sign(incomingVelocity.x), 1, 0).normalized, Vector3.up, angleFactor);
+			Vector2 jumpvec = (Vector2) Vector3.Slerp(new Vector3(-Mathf.Sign(incomingVelocity.x) * wjMaxX, 1, 0).normalized, Vector3.up, angleFactor);
 			Vector2 compareAngle = new Vector2(Mathf.Abs(incomingVelocity.x), Mathf.Abs(incomingVelocity.y)).normalized;
-			float force = 1 - wjAnglePenalty * Vector2.Angle(Vector2.one.normalized, compareAngle)/45;
+			float inForce = 1 - wjAnglePenalty * Vector2.Angle(Vector2.one.normalized, compareAngle)/45;
+			float outForce = 1 + wjOutAngleBonus * Mathf.Abs(jumpvec.x);
 			//float forceOut = 1.1f - angleFactor * 0.2f;
-			rigid.velocity = force * (jumpvec * Mathf.Abs(incomingVelocity.x) + new Vector2(0, incomingVelocity.y));
+			rigid.velocity = inForce * outForce * wjForce * (jumpvec * Mathf.Abs(incomingVelocity.x) + new Vector2(0, incomingVelocity.y));
+			if (rigid.velocity.y < wjMinUp)
+			{
+				rigid.velocity = new Vector2(rigid.velocity.x, wjMinUp);
+			}
 			//rigid.velocity = 35 * jumpvec;		//this alternative also feels ok
 
-			incomingVelocity = Vector2.zero;
-			jumping = false;
+
 			if(Mathf.Abs(rigid.velocity.x) > 1)
 			{
-				flipper.FaceDir(rigid.velocity.x > 0);
+				flipper.FaceDir(jumpvec.x > 0);
 			}
+			wjVelCache = Vector2.zero;
+			wjIn = Vector2.zero;
+			wjCacheAge = 10;
+			jumping = false;
 		}
 
 		//Bonking
@@ -351,7 +399,7 @@ public class PlayerControl : MonoBehaviour {
 		float angle = body.transform.eulerAngles.z;
 		return (angle < 180) ? angle : angle - 360;
 	}
-	/*
+
 	// For Debugging:
 	void OnGUI()
 	{
@@ -361,11 +409,11 @@ public class PlayerControl : MonoBehaviour {
 		GUIStyle style = new GUIStyle();
 
 		Rect rect = new Rect(0, 0, w, h * 2 / 100);
-		style.alignment = TextAnchor.UpperRight;
+		style.alignment = TextAnchor.UpperLeft;
 		style.fontSize = Mathf.RoundToInt(2 * h * 0.02f);
 		style.normal.textColor = (windowTimer > 0) ? new Color (0.2f, 0.9f, 0.2f, 1.0f) : new Color (0.3f, 0.4f, 0.3f, 1.0f);
-		string text = string.Format("{0:0.0} ms \n ({1:0.} vel)", windowTimer, rigid.velocity);
+		string text = string.Format("{0:0.0} ms)", wjCacheAge);
 		GUI.Label(rect, text, style);
 	}
-	*/
+
 }
