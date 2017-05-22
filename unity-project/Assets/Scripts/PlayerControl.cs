@@ -128,13 +128,13 @@ public class PlayerControl : MonoBehaviour {
 			xCross = Mathf.Abs((- body.transform.up * bodyColl.size.y).x);
 			sizeY = groundCheckHeight + 0.5f * bodyColl.size.y * Mathf.Clamp01(1 - Mathf.Abs(45 - Mathf.Abs(getRotation()))/45);
 		}
-		groundCheck.transform.localPosition = collCenter + pointToPos;// new Vector3(pointToPos.x * flipper.direction, pointToPos.y, pointToPos.z);
-		groundCheck.gameObject.GetComponent<BoxCollider2D>().size = new Vector2 (xCross * 0.8f, sizeY);
+		groundCheck.transform.localPosition = collCenter + pointToPos - 0.05f * Vector3.up;// new Vector3(pointToPos.x * flipper.direction, pointToPos.y, pointToPos.z);
+		groundCheck.gameObject.GetComponent<BoxCollider2D>().size = new Vector2 (xCross * 0.6f, sizeY);
 		//Wallchecks
-		wallChecks[0].transform.localPosition = collCenter + 0.5f * bodyColl.size.x * Vector3.right;
-		wallChecks[1].transform.localPosition = collCenter - 0.5f * bodyColl.size.x * Vector3.right;
-		wallChecks[0].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(bodyColl.size.x * groundCheckHeight * 0.55f, bodyColl.size.y * 0.6f);
-		wallChecks[1].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(bodyColl.size.x * groundCheckHeight * 0.55f, bodyColl.size.y * 0.6f);
+		wallChecks[0].transform.localPosition = collCenter + 0.5f * bodyColl.size.x * Vector3.right + 0.1f * Vector3.up;
+		wallChecks[1].transform.localPosition = collCenter - 0.5f * bodyColl.size.x * Vector3.right + 0.1f * Vector3.up;
+		wallChecks[0].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(groundCheckHeight, bodyColl.size.y * 0.6f);
+		wallChecks[1].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(groundCheckHeight, bodyColl.size.y * 0.6f);
 
 		//Animation Parameter update
 		anim.SetBool("Grounded", groundCheck.overlaps);
@@ -204,13 +204,25 @@ public class PlayerControl : MonoBehaviour {
 			body.transform.up = Vector3.up;
 			vault = false;
 		}
+
+		//Get rid of a bug:
+		action = !wallChecks[frontCheck].overlaps && action;
 	}
 
 	void FixedUpdate ()
 	{
 		//Ground Movement
-		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState || currentState.fullPathHash == slideState)
+		if((currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState 
+			|| currentState.fullPathHash == slideState || currentState.fullPathHash == bonkState)
+			&& groundCheck.overlaps)
 		{
+			if(action && rigid.velocity.y == 0) //Slide
+			{
+				action = false;
+				rigid.AddForce(Vector2.right * (flipper.direction * slideBoost));
+				anim.SetTrigger("Action");
+			}
+
 			body.transform.up = Vector3.up;
 			if(jumping && !action && !anim.GetBool("Action")
 				&& (currentState.fullPathHash != slideState || Mathf.Abs(rigid.velocity.x) <= maxSpeed * maxSlideJumpSpeedFactor)) //Prevent immediate jumpout
@@ -224,13 +236,6 @@ public class PlayerControl : MonoBehaviour {
 					rigid.AddForce(Vector2.Scale(backflipForce, (Vector2.right * flipper.direction)));
 					// ^ adding an additional backwards force on a backflip feels good
 				}
-			}
-
-			if(action) //Slide
-			{
-				action = false;
-				rigid.AddForce(Vector2.right * (flipper.direction * slideBoost));
-				anim.SetTrigger("Action");
 			}
 
 			//Friction
@@ -276,7 +281,7 @@ public class PlayerControl : MonoBehaviour {
 				rigid.velocity = Vector2.down * maxFallSpeed;
 			}
 			//Diving
-			if(action)
+			if(action && rigid.velocity.y < 23)
 			{
 				//Commence dive
 				rigid.velocity = new Vector2(flipper.direction * Mathf.Max(Mathf.Abs(rigid.velocity.x), maxSpeed) , rigid.velocity.y);
@@ -331,9 +336,8 @@ public class PlayerControl : MonoBehaviour {
 		if(currentState.fullPathHash == bonkState && !bonked)
 		{
 			//rigid.AddForce(-flipper.direction * new Vector2(bonkBounceFactor * maxSpeed, 0), ForceMode2D.Impulse);	//leads to errors
-			rigid.velocity = new Vector2(-rigid.velocity.x * bonkBounceFactor * 0.3f, rigid.velocity.y);
+			rigid.velocity = new Vector2(-Mathf.Sign(rigid.velocity.x) * Mathf.Max(Mathf.Abs(rigid.velocity.x) * bonkBounceFactor * 0.3f, 8), rigid.velocity.y);
 			bonked = true;
-			print("bonk");
 		}
 		if(currentState.fullPathHash == idleState)
 		{
