@@ -9,12 +9,20 @@ using UnityEngine;
 
 public class FlipSprite : MonoBehaviour {
 
+	public bool autoFlip;
 	[HideInInspector] public float direction;	//1: facing right, -1: facing left
 
 	public void Awake()
 	{
 		//It assumes all sprites face right by default
 		direction = Mathf.Sign(transform.localScale.x);
+	}
+
+	void Update()
+	{
+		if (autoFlip) {
+			FaceDir (Mathf.Sign(GetComponent<Rigidbody2D>().velocity.x) > 0);
+		}
 	}
 
 	public void Flip()	//TODO this should probably be its own script
