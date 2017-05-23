@@ -81,15 +81,15 @@ public class PlayerControl : MonoBehaviour {
 
 	void Awake () {
 		// Setting up references.
-		groundCheck = transform.Find("GroundCheck").GetComponent<OverlapCheck>();
+		groundCheck = transform.FindChild("GroundCheck").GetComponent<OverlapCheck>();
 		anim = GetComponentInChildren<Animator>();
 		rigid = GetComponent<Rigidbody2D>();
 		flipper = GetComponentInChildren<FlipSprite>();
-		body = transform.Find("Body").gameObject;
+		body = transform.FindChild("Body").gameObject;
 		wallChecks = new OverlapCheck[2];
-		wallChecks[0]= transform.Find("WallCheck1").GetComponent<OverlapCheck>();
-		wallChecks[1] = transform.Find("WallCheck2").GetComponent<OverlapCheck>();
-		vaultCheck = transform.Find("VaultCheck").GetComponent<OverlapCircle>();
+		wallChecks[0]= transform.FindChild("WallCheck1").GetComponent<OverlapCheck>();
+		wallChecks[1] = transform.FindChild("WallCheck2").GetComponent<OverlapCheck>();
+		vaultCheck = transform.FindChild("VaultCheck").GetComponent<OverlapCircle>();
 
 		//Animation state setup
 		idleState = Animator.StringToHash("Base Layer.Idle");
@@ -401,6 +401,7 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	// For Debugging:
+	/*
 	void OnGUI()
 	{
 		//int w = Mathf.RoundToInt(Screen.width * size), h = Mathf.RoundToInt(Screen.height * size);
@@ -415,5 +416,6 @@ public class PlayerControl : MonoBehaviour {
 		string text = string.Format("{0:0.0} ms)", wjCacheAge);
 		GUI.Label(rect, text, style);
 	}
+	*/
 
 }

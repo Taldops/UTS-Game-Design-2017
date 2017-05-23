@@ -52,12 +52,12 @@ public class EnemyControl : MonoBehaviour {
 
 	void Awake () {
 		// Setting up references.
-		groundCheck = transform.Find("GroundCheck").GetComponent<OverlapCheck>();
+		groundCheck = transform.FindChild("GroundCheck").GetComponent<OverlapCheck>();
 		anim = GetComponent<Animator>();
 		rigid = GetComponent<Rigidbody2D>();
 		flipper = GetComponent<FlipSprite>();
-		wallCheckFront = transform.Find("WallCheckFront").GetComponent<OverlapCheck>();
-		wallCheckBack = transform.Find("WallCheckBack").GetComponent<OverlapCheck>();
+		wallCheckFront = transform.FindChild("WallCheckFront").GetComponent<OverlapCheck>();
+		wallCheckBack = transform.FindChild("WallCheckBack").GetComponent<OverlapCheck>();
 
 		//Animation state setup
 		idleState = Animator.StringToHash("Base Layer.Idle");

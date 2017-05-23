@@ -2,10 +2,10 @@ using UnityEngine;
 using System.Collections;
 
 public class Shuriken : MonoBehaviour {
-	public float speed = 0.1f;
+	public float speed = 30f;
 	public int damage = 1;
 	public Vector3 normalizedDirection;
-	private float timeout = 3;
+	private float timeout = 1;
 	private int living = 0;
 	public bool isEnemy;
 
@@ -23,14 +23,15 @@ public class Shuriken : MonoBehaviour {
 		//Debug.Log("Triggered");
 		if(isEnemy){
 		PlayerCharacter player = other.transform.parent.GetComponent<PlayerCharacter>();
-		if (player != null) {
+        //PlayerCharacter player = other.transform.GetComponent<PlayerCharacter>();
+            if (player != null) {
 			player.Hurt(damage);
 			//Debug.Log("PlayerHit");
 			Destroy(this.gameObject);
 		}
 		}
 		if(!isEnemy){
-		EnemyCharacter enemy = other.transform.parent.GetComponent<EnemyCharacter>();
+		EnemyCharacter enemy = other.transform.GetComponent<EnemyCharacter>();
 		if (enemy != null) {
 			enemy.Hurt(damage);
 			//Debug.Log("PlayerHit");

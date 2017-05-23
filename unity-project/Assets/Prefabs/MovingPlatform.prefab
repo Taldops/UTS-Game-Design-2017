@@ -83,6 +83,7 @@ MonoBehaviour:
   secondLocation: {x: 0, y: 0, z: 0}
   moveRight: 1
   moveTime: 3
+  movedSoFar: 0
 --- !u!212 &212460490862319068
 SpriteRenderer:
   m_ObjectHideFlags: 1

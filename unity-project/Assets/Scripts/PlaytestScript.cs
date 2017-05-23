@@ -12,8 +12,8 @@ public class PlaytestScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
-		player = GameObject.FindGameObjectWithTag("Player");
-		startingPos = player.transform.position;
+		player = GameObject.Find("Hero");
+		//startingPos = player.transform.position;
 	}
 
 	// Update is called once per frame
@@ -22,11 +22,18 @@ public class PlaytestScript : MonoBehaviour {
 		{
 			time += Time.deltaTime;
 		}
+		
+		if(!player.transform.GetComponent<PlayerCharacter>().alive()){
+//yield WaitForSeconds(1.0);
+			Application.LoadLevel(Application.loadedLevel);
+		}
 
 		//Reset Button
 		if(Input.GetKeyDown(KeyCode.R))
 		{
-			player.transform.position = startingPos;
+			
+			
+			Application.LoadLevel(Application.loadedLevel);
 			time = 0;
 			completed = false;
 		}

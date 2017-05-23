@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4811357840371998}
   - component: {fileID: 61725445181405652}
   - component: {fileID: 114003935932662082}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: GroundCheck
   m_TagString: Untagged
   m_Icon: {fileID: -2065832391, guid: 0000000000000000d000000000000000, type: 0}
@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 4695498571315164}
   - component: {fileID: 61234783703005776}
   - component: {fileID: 114382123972884162}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: WallCheckBack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55,7 +55,7 @@ GameObject:
   - component: {fileID: 4411421751304800}
   - component: {fileID: 61918667275553078}
   - component: {fileID: 114804717383521230}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: WallCheckFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -77,9 +77,9 @@ GameObject:
   - component: {fileID: 61748226272616060}
   - component: {fileID: 114977442129948546}
   - component: {fileID: 114109206422466238}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: ShootingEnemy
-  m_TagString: Player
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -288,7 +288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   overlaps: 0
-  mask: 0
+  tagList: []
   showDetector: 1
 --- !u!114 &114018063417216554
 MonoBehaviour:
@@ -301,7 +301,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb77cfadbddafd34b95ccb810659c1e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  facingRight: 1
+  direction: 0
 --- !u!114 &114109206422466238
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -338,7 +338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   overlaps: 0
-  mask: 0
+  tagList: []
   showDetector: 1
 --- !u!114 &114804717383521230
 MonoBehaviour:
@@ -352,7 +352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   overlaps: 0
-  mask: 0
+  tagList: []
   showDetector: 1
 --- !u!114 &114977442129948546
 MonoBehaviour:
