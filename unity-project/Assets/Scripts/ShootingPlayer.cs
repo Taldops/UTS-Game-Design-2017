@@ -30,7 +30,7 @@ public class ShootingPlayer : MonoBehaviour {
 						
 						_shuriken.GetComponent<Shuriken>().normalizedDirection = new Vector3(GetComponentInChildren<FlipSprite>().direction, 0 ,0);
 						_shuriken.GetComponent<Shuriken>().isEnemy = false;	
-						_shuriken.GetComponent<Shuriken>().speed = 20;						//Vector3.Normalize(target.Position - character.Position)
+						//_shuriken.GetComponent<Shuriken>().speed = 20;						//Vector3.Normalize(target.Position - character.Position)
 						_shuriken.transform.position = this.transform.position; //+ offset;
 						//Debug.Log("Fired");
 						//_fireball.transform.rotation = transform.rotation;

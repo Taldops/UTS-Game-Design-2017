@@ -5,7 +5,7 @@ public class Shuriken : MonoBehaviour {
 	public float speed = 30f;
 	public int damage = 1;
 	public Vector3 normalizedDirection;
-	private float timeout = 1;
+	private float timeout = 2;
 	private int living = 0;
 	public bool isEnemy;
 
