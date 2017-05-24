@@ -31,7 +31,6 @@ public class PlayerControl : MonoBehaviour {
 	public float slideBoost	= 800;		//Speedboost for slide start
 	public float slideBreak = 2;		//How fast you lose speed while sliding
 	public float maxSlideJumpSpeedFactor = 1.3f; //How much of the normal max speed can be reached with a slideJump
-	public Vector2 vaultImpulse = new Vector2(200, 600);	//Fore that gets applied when a vault is performed
 	public float bonkBounceFactor = 1.3f;
 
 	//Other parameters
@@ -44,7 +43,6 @@ public class PlayerControl : MonoBehaviour {
 	private GameObject body;
 	private OverlapCheck groundCheck;
 	private OverlapCheck[] wallChecks;
-	private OverlapCircle vaultCheck;
 
 	//Animation State Hashes:
 	int idleState;
@@ -57,18 +55,15 @@ public class PlayerControl : MonoBehaviour {
 	int slideState;
 	int diveState;
 	int rollState;
-	int vaultState;
 	int bonkState;
 
 	//internal state
 	bool jumping = false;	//keep track of jumoing
 	bool action = false;	//keep track of sliding and diving
-	bool vault = false;		//has the vault impulse been applied yet?
 	float currentInputMove;		//current horizontal input
 	float currentInputJump;		//current horizontal input
 	AnimatorStateInfo currentState;
 	float gravMem;	//stores original rigidbody.gravityscale
-	Vector3 vcPos;	//Stores position of vault detector
 	bool bonked = false;
 	Vector2 wjVelCache = Vector2.zero;
 	Vector2 wjIn = Vector2.zero;	//TODO Refactor so that this isn't needed and Cahe is used instead
@@ -89,7 +84,6 @@ public class PlayerControl : MonoBehaviour {
 		wallChecks = new OverlapCheck[2];
 		wallChecks[0]= transform.FindChild("WallCheck1").GetComponent<OverlapCheck>();
 		wallChecks[1] = transform.FindChild("WallCheck2").GetComponent<OverlapCheck>();
-		vaultCheck = transform.FindChild("VaultCheck").GetComponent<OverlapCircle>();
 
 		//Animation state setup
 		idleState = Animator.StringToHash("Base Layer.Idle");
@@ -102,11 +96,9 @@ public class PlayerControl : MonoBehaviour {
 		slideState = Animator.StringToHash("Base Layer.Slide");
 		diveState = Animator.StringToHash("Base Layer.Dive");
 		rollState = Animator.StringToHash("Base Layer.Roll");
-		vaultState = Animator.StringToHash("Base Layer.Vault");
 		bonkState = Animator.StringToHash("Base Layer.Bonk");
 
 		gravMem = rigid.gravityScale;
-		vcPos = vaultCheck.transform.localPosition;
 	}
 
 	// Update is called once per frame
@@ -117,7 +109,6 @@ public class PlayerControl : MonoBehaviour {
 		windowTimer -= Time.deltaTime;
 
 		//Updating Checks
-		vaultCheck.transform.localPosition = 0.075f * rigid.velocity + Vector2.down; //new Vector3 (flipper.direction * vcPos.x, -Mathf.Sign(rigid.velocity.y) * vcPos.y, vcPos.z);
 		BoxCollider2D bodyColl = body.GetComponent<BoxCollider2D>();
 		Vector3 collCenter = body.transform.localPosition + new Vector3 (bodyColl.offset.x * flipper.direction, bodyColl.offset.y, 0);
 		Vector3 pointToPos;
@@ -150,7 +141,6 @@ public class PlayerControl : MonoBehaviour {
 		anim.SetFloat("SpeedY", rigid.velocity.y);
 		anim.SetInteger("Input", (int) currentInputMove);
 		anim.SetBool("DirAlign", currentInputMove * rigid.velocity.x >= 0);
-		anim.SetBool("CouldVault", !vaultCheck.overlaps);
 		anim.SetFloat("SpeedMod", Mathf.Abs(rigid.velocity.x)/maxSpeed);
 
 		//Jumping:
@@ -169,7 +159,7 @@ public class PlayerControl : MonoBehaviour {
 		}
 
 		//Rotating towards neutral
-		if(currentState.fullPathHash == vaultState || currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState || currentState.fullPathHash == bonkState)
+		if(currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState || currentState.fullPathHash == bonkState)
 		{
 			Vector3 from = flipper.direction * body.transform.right;
 			Vector3 to = Vector3.right * flipper.direction;
@@ -238,11 +228,10 @@ public class PlayerControl : MonoBehaviour {
 			v = (v.SqrMagnitude() > 1) ? v.normalized : v;
 			body.transform.right = new Vector3(Mathf.Cos(v.y), flipper.direction *  v.y, 0);
 		}
-		//Rolling after diving resets orientation and vault status
+		//Rolling after diving resets orientation
 		if(currentState.fullPathHash == rollState)
 		{
 			body.transform.up = Vector3.up;
-			vault = false;
 		}
 
 		//Get rid of a bug:
@@ -302,7 +291,7 @@ public class PlayerControl : MonoBehaviour {
 		}
 
 		//Air Movement
-		if(currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState || currentState.fullPathHash == backflipState || currentState.fullPathHash == vaultState)
+		if(currentState.fullPathHash == jumpState || currentState.fullPathHash == fallState || currentState.fullPathHash == backflipState)
 		{
 			if(Mathf.Abs(rigid.velocity.x) < maxAirAccel || currentInputMove * rigid.velocity.x <= 0)
 			{
@@ -327,12 +316,6 @@ public class PlayerControl : MonoBehaviour {
 				rigid.velocity = new Vector2(flipper.direction * Mathf.Max(Mathf.Abs(rigid.velocity.x), maxSpeed) , rigid.velocity.y);
 				anim.SetTrigger("Action");
 				action = false;
-				vault = true;
-			}
-			if(currentState.fullPathHash == vaultState && vault)
-			{
-				vault = false;
-				rigid.AddForce(vaultImpulse);
 			}
 		}
 
