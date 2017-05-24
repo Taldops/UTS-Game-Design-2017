@@ -68,6 +68,7 @@ public class PlayerControl : MonoBehaviour {
 	Vector2 wjVelCache = Vector2.zero;
 	Vector2 wjIn = Vector2.zero;	//TODO Refactor so that this isn't needed and Cahe is used instead
 	float wjCacheAge;
+	float rollSpeed = -1;
 
 	//For Walljumps:
 	//private Vector2 incomingVelocity = Vector2.zero;
@@ -112,28 +113,27 @@ public class PlayerControl : MonoBehaviour {
 		BoxCollider2D bodyColl = body.GetComponent<BoxCollider2D>();
 		Vector3 collCenter = body.transform.localPosition + new Vector3 (bodyColl.offset.x * flipper.direction, bodyColl.offset.y, 0);
 		Vector3 pointToPos;
-		float xCross;
-		float sizeY;
-		//TODO Refactor this if construction
-		if((- body.transform.up * bodyColl.size.y).y < (body.transform.right * bodyColl.size.x).y * flipper.direction)
+		Vector3 pointTopRight = collCenter + new Vector3(bodyColl.size.x * flipper.direction, bodyColl.size.y, 0) * 0.5f;
+		pointTopRight = Quaternion.AngleAxis(getRotation(), Vector3.forward) * pointTopRight;
+		float sizeX;
+		if(currentState.fullPathHash == diveState)
 		{
-			pointToPos = - body.transform.up * bodyColl.size.y * 0.5f;
-			xCross = Mathf.Abs((body.transform.right * bodyColl.size.x).x);
-			sizeY = groundCheckHeight + 0.5f * bodyColl.size.x * Mathf.Clamp01(1 - Mathf.Abs(45 - Mathf.Abs(getRotation()))/45);
+			pointToPos = collCenter + new Vector3(bodyColl.size.x * flipper.direction, -bodyColl.size.y, 0) * 0.5f;
+			pointToPos = Quaternion.AngleAxis(getRotation(), Vector3.forward) * pointToPos;
+			sizeX = Mathf.Abs(pointTopRight.x - pointToPos.x);
 		}
 		else
 		{
-			pointToPos = body.transform.right * flipper.direction * bodyColl.size.x * 0.5f;
-			xCross = Mathf.Abs((- body.transform.up * bodyColl.size.y).x);
-			sizeY = groundCheckHeight + 0.5f * bodyColl.size.y * Mathf.Clamp01(1 - Mathf.Abs(45 - Mathf.Abs(getRotation()))/45);
+			pointToPos = -0.5f * Vector3.up * bodyColl.size.y;
+			sizeX = bodyColl.size.x * 0.7f;
 		}
-		groundCheck.transform.localPosition = collCenter + pointToPos - 0.05f * Vector3.up;// new Vector3(pointToPos.x * flipper.direction, pointToPos.y, pointToPos.z);
-		groundCheck.gameObject.GetComponent<BoxCollider2D>().size = new Vector2 (xCross * 0.6f, sizeY);
+		groundCheck.transform.localPosition = collCenter + pointToPos;
+		groundCheck.gameObject.GetComponent<BoxCollider2D>().size = new Vector2 (sizeX, groundCheckHeight);
 		//Wallchecks
 		wallChecks[0].transform.localPosition = collCenter + 0.5f * bodyColl.size.x * Vector3.right + 0.1f * Vector3.up;
 		wallChecks[1].transform.localPosition = collCenter - 0.5f * bodyColl.size.x * Vector3.right + 0.1f * Vector3.up;
-		wallChecks[0].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(groundCheckHeight, bodyColl.size.y * 0.6f);
-		wallChecks[1].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(groundCheckHeight, bodyColl.size.y * 0.6f);
+		wallChecks[0].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(groundCheckHeight, groundCheckHeight);
+		wallChecks[1].gameObject.GetComponent<BoxCollider2D>().size = new Vector2(groundCheckHeight, groundCheckHeight);
 
 		//Animation Parameter update
 		anim.SetBool("Grounded", groundCheck.overlaps);
@@ -141,7 +141,7 @@ public class PlayerControl : MonoBehaviour {
 		anim.SetFloat("SpeedY", rigid.velocity.y);
 		anim.SetInteger("Input", (int) currentInputMove);
 		anim.SetBool("DirAlign", currentInputMove * rigid.velocity.x >= 0);
-		anim.SetFloat("SpeedMod", Mathf.Abs(rigid.velocity.x)/maxSpeed);
+		anim.SetFloat("SpeedMod", Mathf.Max(Mathf.Abs(rigid.velocity.x)/maxSpeed, 0.25f));
 
 		//Jumping:
 		if(currentState.fullPathHash == idleState || currentState.fullPathHash == runState || currentState.fullPathHash == skidState || currentState.fullPathHash == slideState)
@@ -181,24 +181,8 @@ public class PlayerControl : MonoBehaviour {
 			wjVelCache = rigid.velocity;
 			wjCacheAge = 0;
 		}
-		/*
-		if((Mathf.Abs(rigid.velocity.x) > Mathf.Abs(wjVelCache.x) || wjCacheAge > wjGrace)
-			&& currentState.fullPathHash != walljumpState)
-		{
-			float newY = 0;
-			if(wjCacheAge > wjGrace)
-			{
-				newY = rigid.velocity.y;
-			}
-			else
-			{
-				newY = Mathf.Clamp(Mathf.Max(rigid.velocity.y, wjVelCache.y), -30, 22);
-			}
-			wjVelCache = new Vector2(rigid.velocity.x, newY);
-			wjCacheAge = 0;
-		}
-		*/
 		wjCacheAge += Time.deltaTime;
+
 		//Jump check
 		int frontCheck = (flipper.direction * (wallChecks[0].gameObject.transform.position.x - transform.position.x) > 0) ? 0 : 1;
 		bool wallCollision = (wallChecks[frontCheck].overlaps && rigid.velocity.x * flipper.direction > 0) || (wallChecks[1 - frontCheck].overlaps && rigid.velocity.x * flipper.direction < 0);
@@ -231,7 +215,16 @@ public class PlayerControl : MonoBehaviour {
 		//Rolling after diving resets orientation
 		if(currentState.fullPathHash == rollState)
 		{
-			body.transform.up = Vector3.up;
+			if(rollSpeed < 1)
+			{
+				body.transform.up = Vector3.up;
+				rollSpeed = Mathf.Max(Mathf.Abs(rigid.velocity.y), Mathf.Abs(rigid.velocity.x), maxSpeed * 0.5f);
+			}
+			anim.SetFloat("SpeedMod", Mathf.Max(rollSpeed/maxSpeed, 0.25f));
+		}
+		else
+		{
+			rollSpeed = -1;
 		}
 
 		//Get rid of a bug:
