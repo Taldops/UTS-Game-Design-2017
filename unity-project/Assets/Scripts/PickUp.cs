@@ -18,9 +18,9 @@ public class PickUp : MonoBehaviour {
 			if(!collected)
 			player.getPoints(value);
 		    collected = true;
-			Debug.Log("PlayerPickup");
+			Debug.Log ("PlayerPickup");
 			Destroy(this.gameObject);
-		}
+			}
 		}
 		
 		
