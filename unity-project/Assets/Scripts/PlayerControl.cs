@@ -77,14 +77,14 @@ public class PlayerControl : MonoBehaviour {
 
 	void Awake () {
 		// Setting up references.
-		groundCheck = transform.FindChild("GroundCheck").GetComponent<OverlapCheck>();
+		groundCheck = transform.Find("GroundCheck").GetComponent<OverlapCheck>();
 		anim = GetComponentInChildren<Animator>();
 		rigid = GetComponent<Rigidbody2D>();
 		flipper = GetComponentInChildren<FlipSprite>();
-		body = transform.FindChild("Body").gameObject;
+		body = transform.Find("Body").gameObject;
 		wallChecks = new OverlapCheck[2];
-		wallChecks[0]= transform.FindChild("WallCheck1").GetComponent<OverlapCheck>();
-		wallChecks[1] = transform.FindChild("WallCheck2").GetComponent<OverlapCheck>();
+		wallChecks[0]= transform.Find("WallCheck1").GetComponent<OverlapCheck>();
+		wallChecks[1] = transform.Find("WallCheck2").GetComponent<OverlapCheck>();
 
 		//Animation state setup
 		idleState = Animator.StringToHash("Base Layer.Idle");

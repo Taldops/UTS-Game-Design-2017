@@ -20,7 +20,8 @@ public class CameraFollow : MonoBehaviour
 
 	void Awake()
 	{
-		if (maxXAndY == Vector2.zero && minXAndY == Vector2.zero)
+        subject = GameObject.Find("Hero");
+        if (maxXAndY == Vector2.zero && minXAndY == Vector2.zero)
 		{
 			maxXAndY = new Vector2(float.MaxValue, float.MaxValue);		// The maximum x and y coordinates the camera can have.
 			minXAndY = Vector2.one * float.MinValue;		// The minimum x and y coordinates the camera can have.

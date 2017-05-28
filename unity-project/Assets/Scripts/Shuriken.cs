@@ -22,13 +22,15 @@ public class Shuriken : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D other) {
 		//Debug.Log("Triggered");
 		if(isEnemy){
+            if(other.transform.parent != null) { 
 		PlayerCharacter player = other.transform.parent.GetComponent<PlayerCharacter>();
         //PlayerCharacter player = other.transform.GetComponent<PlayerCharacter>();
             if (player != null) {
 			player.Hurt(damage);
 			//Debug.Log("PlayerHit");
 			Destroy(this.gameObject);
-		}
+                }
+            }
 		}
 		if(!isEnemy){
 		EnemyCharacter enemy = other.transform.GetComponent<EnemyCharacter>();
