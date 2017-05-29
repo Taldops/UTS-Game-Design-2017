@@ -137,7 +137,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1415460899846124}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.37710953, y: 3.8989916, z: 0}
+  m_LocalPosition: {x: 40, y: 20, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_Children:
   - {fileID: 4501575914363316}
@@ -248,7 +248,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.5, y: 2.25}
+  m_Size: {x: 1.1, y: 2.25}
   m_EdgeRadius: 0
 --- !u!61 &61538052129075588
 BoxCollider2D:
@@ -362,15 +362,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d2f18051a9085f418fa78976ef13131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveForceGround: 70
-  moveForceAir: 50
-  maxSpeed: 20
+  moveForceGround: 50
+  moveForceAir: 40
+  maxSpeed: 22
   maxFallSpeed: 50
   jumpForce: 30
   autoBreak: 8
   autoBreakAir: 2
   jumpBreak: 25
-  maxAirAccel: 12
+  maxAirAccel: 14
   backflipForce: {x: -6, y: 8}
   minJumpHight: 28
   wjAnglePenalty: 0.25
