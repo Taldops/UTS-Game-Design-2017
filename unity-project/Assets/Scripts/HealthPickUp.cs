@@ -12,16 +12,21 @@ public class HealthPickUp : MonoBehaviour {
 		
 	}
 
-	void OnTriggerEnter2D(Collider2D other) {
-		PlayerCharacter player = other.transform.parent.GetComponent<PlayerCharacter>();
-		if (player != null) {
-			if(!collected)
-			player.getHealth(value);
-		    collected = true;
-			Debug.Log("PlayerPickup");
-			Destroy(this.gameObject);
-		}
-		}
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.transform.parent != null)
+        {
+            PlayerCharacter player = other.transform.parent.GetComponent<PlayerCharacter>();
+            if (player != null)
+            {
+                if (!collected)
+                    player.getHealth(value);
+                collected = true;
+                Debug.Log("PlayerPickup");
+                Destroy(this.gameObject);
+            }
+        }
+    }
 		
 		
 	}

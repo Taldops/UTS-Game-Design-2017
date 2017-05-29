@@ -44,13 +44,13 @@ public class PlaytestScript : MonoBehaviour {
 		//Reset Button
 		if(Input.GetKeyDown(KeyCode.R))
 		{
-			
-			
-			Application.LoadLevel(Application.loadedLevel);
-			time = 0;
-			completed = false;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 		}
-	}
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
+    }
     /*
     // playerDead()
     IEnumerator playerDead()
