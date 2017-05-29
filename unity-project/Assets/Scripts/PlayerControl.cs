@@ -480,7 +480,7 @@ public class PlayerControl : MonoBehaviour {
 		{
 			clearAllFlags();
 		}
-		if((!busy || currentlyInState(bonkState)) && groundCheck.overlaps && !currentlyInState(jumpState, idleState, skidState) && !actionInProgress
+		if((!busy || currentlyInState(bonkState)) && groundCheck.overlaps && !currentlyInState(idleState, skidState) && !actionInProgress
 			&& (currentState.fullPathHash != runState || Mathf.Abs(rigid.velocity.x) < 6) && !anyFlags() && Mathf.Abs(rigid.velocity.y) < 1)
 		{
 			anim.SetTrigger("Idle");
