@@ -44,6 +44,7 @@ public class PlayerControl : MonoBehaviour {
 
 	//Other parameters
 	public float checkDepth = 1;		//Depth of wall and ground checks. Higher values mean earlier/more sesitive detection
+	public Vector2 hitKnockback = new Vector2(-8, 4);	//Force impact the player recieves upon getting hit
 
 	//reference shorthand
 	private Animator anim;
@@ -65,6 +66,7 @@ public class PlayerControl : MonoBehaviour {
 	int diveState;
 	int rollState;
 	int bonkState;
+	int getHitState;
 
 	//internal state
 	AnimatorStateInfo currentState;
@@ -86,6 +88,7 @@ public class PlayerControl : MonoBehaviour {
 	bool wjFlag = false;
 	bool rollFlag = false;
 	bool bonkFlag = false;
+	bool hitFlag = false;
 
 	void Awake () {
 		// Setting up references.
@@ -108,6 +111,7 @@ public class PlayerControl : MonoBehaviour {
 		diveState = Animator.StringToHash("Base Layer.Dive");
 		rollState = Animator.StringToHash("Base Layer.Roll");
 		bonkState = Animator.StringToHash("Base Layer.Bonk");
+		getHitState = Animator.StringToHash("Base Layer.GetHit");
 
 		gravMem = rigid.gravityScale;
 	}
@@ -134,6 +138,25 @@ public class PlayerControl : MonoBehaviour {
 	{
 		basicMovement();
 		applyForces();
+	}
+
+	/*
+	* =====================================================================================
+	* Public Functions
+	* =====================================================================================
+	*/
+
+	/*
+	* Makes the player get hit
+	* Parameter: Multiplier how much the player flies back. Default is 1 for normal knockback
+	*/
+	public void GetHit(float force = 1)
+	{
+		rigid.velocity = Vector2.zero;
+		anim.SetTrigger("GetHit");
+		hitFlag = true;
+		actionInProgress = true;
+		clearAllFlags();
 	}
 	
 	/*
@@ -401,6 +424,14 @@ public class PlayerControl : MonoBehaviour {
 			rollFlag = false;
 			actionInProgress = false;
 		}
+
+		//Getting Hit
+		if(hitFlag)
+		{
+			rigid.AddForce(alignForward(hitKnockback), ForceMode2D.Impulse);
+			hitFlag = false;
+			actionInProgress = false;
+		}
 	}
 
 	/*
@@ -413,7 +444,7 @@ public class PlayerControl : MonoBehaviour {
 		{
 			wjVelCache = new Vector2(rigid.velocity.x, wjVelCache.y);
 		}
-		if(Mathf.Abs(rigid.velocity.y) > Mathf.Abs(wjVelCache.y) && currentState.fullPathHash != walljumpState)
+		if(rigid.velocity.y > 0 || (Mathf.Abs(rigid.velocity.y) > Mathf.Abs(wjVelCache.y) && currentState.fullPathHash != walljumpState))
 		{
 			wjVelCache = new Vector2(wjVelCache.x, Mathf.Clamp(Mathf.Max(rigid.velocity.y, wjVelCache.y), -30, 22));
 		}
@@ -532,7 +563,8 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	/*
-	 * Sets all flags and buffered actions to false
+	 * Sets all flags and buffered actions to false.
+	 * EXCEPT HITFLAG. That one will be unaffacted.
 	 * */
 	private void clearAllFlags()
 	{

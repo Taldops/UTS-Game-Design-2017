@@ -13,6 +13,7 @@ public class Lava : MonoBehaviour {
 		PlayerCharacter player = other.transform.parent.GetComponent<PlayerCharacter>();
 		if (player != null) {
 			player.Hurt(damage);
+			other.transform.parent.GetComponent<PlayerControl>().GetHit();
 		}
 		EnemyCharacter enemy = other.transform.parent.GetComponent<EnemyCharacter>();
 		if (enemy != null) {
