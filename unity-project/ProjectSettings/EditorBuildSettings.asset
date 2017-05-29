@@ -26,3 +26,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MovementTests.unity
     guid: 60162472ede2b894c83f98f5776166df
+  - enabled: 1
+    path: Assets/Scenes/Level5.unity
+    guid: afd8526a0b7b50345bb4630319201b7c
