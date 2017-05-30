@@ -7,17 +7,13 @@ public class PickUp : MonoBehaviour {
     public float secondsToAdd = 5;
 	private bool collected = false;
 
-	public AudioClip collectedSound;
-	public AudioSource source;
-
 	void Update() {
 		
 	}
 
     void OnTriggerEnter2D(Collider2D other)
     {
-		//???
-//		source.GetComponent<AudioSource> ();
+		
         if (other.transform.parent != null)
         {
             PlayerCharacter player = other.transform.parent.GetComponent<PlayerCharacter>();
@@ -26,8 +22,7 @@ public class PickUp : MonoBehaviour {
             {
                 if (!collected) {
 					
-					//Try adding sound
-					//source.PlayOneShot(collectedSound);
+
 
                     player.getPoints(value);
                     GameObject.Find("Goal Zone").transform.GetComponent<PlaytestScript>().LevelTime += secondsToAdd;
