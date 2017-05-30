@@ -128,6 +128,16 @@ public class PlayerControl : MonoBehaviour {
 			//Busy flag is hadled by each action on their own, because some busy states can be cancelled by specific actions
 		}
 		//Not sure if the order is important here
+
+		//Indicate going fast enough
+		if(Mathf.Abs(rigid.velocity.x) > actionThresh)
+		{
+			anim.gameObject.GetComponent<SpriteRenderer>().color = new Color(0, 0.75f, 0, 1);
+		}
+		else
+		{
+			anim.gameObject.GetComponent<SpriteRenderer>().color = Color.black;
+		}
 	}
 
 	void FixedUpdate ()
