@@ -178,7 +178,11 @@ public class PlayerControl : MonoBehaviour {
 	*/
 	private void stateDependentUpdate()
 	{
-
+		//Sliding Friction
+		if(currentState.fullPathHash == slideState)
+		{
+			rigid.AddForce(Vector2.left * rigid.velocity.x * slideBreak, ForceMode2D.Force);
+		}
 
 		//Always face forward when running
 		if(currentState.fullPathHash == runState && rigid.velocity.x != 0)
@@ -400,12 +404,6 @@ public class PlayerControl : MonoBehaviour {
 			//action = false;
 			slideFlag = false;
 			actionInProgress = false;
-		}
-		
-		//Sliding Friction
-		if(currentState.fullPathHash == slideState)
-		{
-			rigid.AddForce(Vector2.left * rigid.velocity.x * slideBreak, ForceMode2D.Force);
 		}
 
 		//Entering Dive

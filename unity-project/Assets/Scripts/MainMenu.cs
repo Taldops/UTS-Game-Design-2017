@@ -8,14 +8,14 @@ public class MainMenu : MonoBehaviour {
 		　　  public GUIStyle random1;  
 	　　      public float guiPlacementX1;  
 	　　      public float guiPlacementY1;   
-		　　  public bool showGUIOutline = true;
+		　　  public bool showGUIOutline = false;
 		　　  
 		　　  void OnGUI(){  
 			　　  
 			　　      GUI.DrawTexture (new Rect (0, 0, Screen.width, Screen.height), backgroundTexture);  
 			　　  
 			　　      if (showGUIOutline) {  
-				　　          if (GUI.Button (new Rect (Screen.width * guiPlacementX1, Screen.height * guiPlacementY1, Screen.width * .5f, Screen.height * .1f), "Start Game")) {  
+				　　          if (GUI.Button (new Rect (Screen.width * guiPlacementX1, Screen.height * guiPlacementY1, Screen.width * .4f, Screen.height * .1f), "Start Game")) {  
 					　　                  print ("Clicked Play Game"); 
 			                         	Application.LoadLevel("ChoiceMap");  
 					　　          }  
@@ -24,7 +24,7 @@ public class MainMenu : MonoBehaviour {
 				　　  
 				　　          
 			　　      } else {  
-				　　          if (GUI.Button (new Rect (Screen.width * guiPlacementX1, Screen.height * guiPlacementY1, Screen.width * .5f, Screen.height * .1f), "", random1)) {  
+				　　          if (GUI.Button (new Rect (Screen.width * guiPlacementX1, Screen.height * guiPlacementY1, Screen.width * .4f, Screen.height * .1f), "", random1)) {  
 					　　                  print ("Clicked Play Game");  
 				       
 					　　          }  
