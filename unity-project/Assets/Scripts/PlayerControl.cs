@@ -38,6 +38,7 @@ public class PlayerControl : MonoBehaviour {
 	//Action parameters:
 	public float slideBoost	= 16;		//Speedboost for slide start
 	public float slideBreak = 1.9f;		//How fast you lose speed while sliding
+	public float slideBreakAirMultiplier = 0.75f;		//How much faster/slower you lose speed after sliding off an edge
 	public float maxSlideJumpSpeedFactor = 1.3f; //How much of the normal max speed can be reached with a slideJump
 	public float bonkBounceFactor = 1.3f;	//How much bonking bounces you backwards
 	public float actionThresh = 14; 	//minimum velocity required for a walljumps and slides
@@ -71,7 +72,6 @@ public class PlayerControl : MonoBehaviour {
 	//internal state
 	AnimatorStateInfo currentState;
 	float gravMem;						//stores original rigidbody.gravityscale
-	float maxSpeedMem;						//stores original maxSpeed. used for some animation speeds
 	Vector2 wjVelCache = Vector2.zero;	//stores velocity that will be used for the walljump
 	float wjCacheAge;					//Keep track of how old ^ is
 	bool busy = false;					//Busy states can't be easily canceled in most cases
@@ -115,7 +115,6 @@ public class PlayerControl : MonoBehaviour {
 		getHitState = Animator.StringToHash("Base Layer.GetHit");
 
 		gravMem = rigid.gravityScale;
-		maxSpeedMem = maxSpeed;
 	}
 
 	// Update is called once per frame
@@ -123,11 +122,6 @@ public class PlayerControl : MonoBehaviour {
 		updateAnimation();
 		updateChecks();
 		bufferActions();
-		if(!wjFlag)
-		{
-			checkForWalljump();
-		}
-		stateDependentUpdate();
 		if(!actionInProgress)
 		{
 			initiateActions();
@@ -139,7 +133,13 @@ public class PlayerControl : MonoBehaviour {
 	void FixedUpdate ()
 	{
 		basicMovement();
+		stateDependentUpdate();
+		if(!wjFlag)
+		{
+			checkForWalljump();
+		}
 		applyForces();
+		//Not sure if the order is important here
 	}
 
 	/*
@@ -151,14 +151,15 @@ public class PlayerControl : MonoBehaviour {
 	/*
 	* Makes the player get hit
 	* Parameter: Multiplier how much the player flies back. Default is 1 for normal knockback
-	*/
-	public void GetHit(float force = 1)
+		*/
+		public void GetHit(float force = 1)
 	{
 		rigid.velocity = Vector2.zero;
 		anim.SetTrigger("GetHit");
 		hitFlag = true;
 		actionInProgress = true;
 		clearAllFlags();
+		clearAllBuffers();
 	}
 
 	/*
@@ -172,7 +173,7 @@ public class PlayerControl : MonoBehaviour {
 		maxAirAccel *= factor;
 		backflipForce = new Vector2(backflipForce.x * factor, backflipForce.y);
 	}
-	
+
 	/*
 	* =====================================================================================
 	* Update Functions
@@ -184,18 +185,19 @@ public class PlayerControl : MonoBehaviour {
 		1. If an input is pressed under the right circumstances, buffer the action (method: bufferActions())
 		2. When the conditions are met, initiate the action by setting the animatio trigger and physics flags (method: initiateActions())
 		3. In the next fixed update, force and speed changes will be applied depending on the set physics flags (method: applyForces())
-	When a physics flag is set, actionInProgress also has to be set. When it is resolved, also clear actionInProgress!
-	*/
+		When a physics flag is set, actionInProgress also has to be set. When it is resolved, also clear actionInProgress!
+		*/
 
-	/*
-	* Continual updates during certain animation states
-	*/
-	private void stateDependentUpdate()
+		/*
+		* Continual updates during certain animation states
+		*/
+		private void stateDependentUpdate()
 	{
 		//Sliding Friction
 		if(currentState.fullPathHash == slideState)
 		{
-			rigid.AddForce(Vector2.left * rigid.velocity.x * slideBreak, ForceMode2D.Force);
+			float friction = groundCheck.overlaps ? slideBreak : slideBreak * slideBreakAirMultiplier;
+			rigid.AddForce(Vector2.left * rigid.velocity.x * friction, ForceMode2D.Force);
 		}
 
 		//Always face forward when running
@@ -229,7 +231,7 @@ public class PlayerControl : MonoBehaviour {
 		//Setting the running animation speed
 		if(currentState.fullPathHash == runState)
 		{
-			anim.SetFloat("SpeedMod", Mathf.Max(Mathf.Abs(rigid.velocity.x)/maxSpeedMem, 0.3f));
+			anim.SetFloat("SpeedMod", Mathf.Max(Mathf.Abs(rigid.velocity.x)/maxSpeed, 0.3f));
 		}
 	}
 
@@ -278,7 +280,7 @@ public class PlayerControl : MonoBehaviour {
 			}
 		}
 	}
-		
+
 	/*
 	 * Buffers actions during certain states, if the corresponding input is pressed.
 	 * */
@@ -365,7 +367,8 @@ public class PlayerControl : MonoBehaviour {
 			rigid.gravityScale = 0;
 			rigid.velocity = new Vector2(flipper.direction * 10, rigid.velocity.y * 0.0f);
 			flipper.FaceDir(wjVelCache.x > 0);
-			clearAllFlags();
+			clearAllBuffers();
+			wallstickFlag = false;
 			wjFlag = true;
 			//Action still in progress!
 		}
@@ -387,6 +390,10 @@ public class PlayerControl : MonoBehaviour {
 				if(newVelocity.y < wjMinUp)
 				{
 					newVelocity = new Vector2(rigid.velocity.x, wjMinUp);
+				}
+				if(Mathf.Abs(newVelocity.x) < (1-angleFactor) * actionThresh)
+				{
+					newVelocity = new Vector2(Mathf.Sign(newVelocity.x) * (1-angleFactor) * actionThresh, newVelocity.y);
 				}
 				if(Mathf.Abs(newVelocity.x) > 1)
 				{
@@ -432,9 +439,9 @@ public class PlayerControl : MonoBehaviour {
 		if(rollFlag)
 		{
 			body.transform.up = Vector3.up;
-			float newVelX = Mathf.Max(Mathf.Abs(rigid.velocity.x), maxSpeed * 0.5f);
+			float newVelX = Mathf.Max(Mathf.Abs(rigid.velocity.x), maxSpeed * 0.75f);
 			rigid.velocity = new Vector2(newVelX * flipper.direction, rigid.velocity.y);
-			anim.SetFloat("SpeedMod", Mathf.Abs(newVelX)/maxSpeedMem);
+			anim.SetFloat("SpeedMod", Mathf.Abs(newVelX)/maxSpeed);
 			rollFlag = false;
 			actionInProgress = false;
 		}
@@ -504,8 +511,10 @@ public class PlayerControl : MonoBehaviour {
 		}
 		groundCheck.transform.localPosition = collCenter + pointToPos;
 		groundCheck.gameObject.GetComponent<BoxCollider2D>().size = new Vector2 (sizeX, checkDepth);
-		//Wallchecks
-		wallCheck.transform.localPosition = collCenter + 0.5f * Mathf.Sign(rigid.velocity.x + 0.2f * flipper.direction) * bodyColl.size.x * Vector3.right + 0.1f * Vector3.up;
+		//Wallcheck
+		float velocitySide = (Mathf.Abs(rigid.velocity.x) > 1) ? Mathf.Sign(rigid.velocity.x) : flipper.direction;
+		float naturalOffset = 0.5f * bodyColl.size.x + 0.2f;
+		wallCheck.transform.localPosition = collCenter + naturalOffset * velocitySide * Vector3.right + 0.1f * Vector3.up;
 		wallCheck.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(checkDepth, checkDepth);
 	}
 
@@ -517,13 +526,12 @@ public class PlayerControl : MonoBehaviour {
 		anim.SetFloat("SpeedX", Mathf.Abs(rigid.velocity.x));
 		anim.SetInteger("Input", (int) Input.GetAxisRaw("Horizontal"));
 		anim.SetBool("DirAlign", Input.GetAxisRaw("Horizontal") * rigid.velocity.x >= 0);
-		anim.SetBool("Busy", busy);
 
 		currentState = anim.GetCurrentAnimatorStateInfo(0);
 		busy = !currentlyInState(runState, idleState, jumpState, fallState, skidState);		//Official List of non-busy states
 		if(Mathf.Abs(rigid.velocity.x) < 1 && Mathf.Abs(rigid.velocity.y) < 1 && !Input.anyKey)
 		{
-			clearAllFlags();
+			clearAllBuffers();
 		}
 		if((!busy || currentlyInState(bonkState)) && groundCheck.overlaps && !currentlyInState(idleState, skidState) && !actionInProgress
 			&& (currentState.fullPathHash != runState || Mathf.Abs(rigid.velocity.x) < 6) && !anyFlags() && Mathf.Abs(rigid.velocity.y) < 1)
@@ -545,8 +553,8 @@ public class PlayerControl : MonoBehaviour {
 
 	/*
 	* Shorthand for checking if the player is currently in one of a number of states
-	*/
-	private bool currentlyInState(params int[] stateList)
+		*/
+		private bool currentlyInState(params int[] stateList)
 	{
 		for(int i = 0; i < stateList.Length; i++)
 		{
@@ -573,23 +581,31 @@ public class PlayerControl : MonoBehaviour {
 	 * */
 	private bool anyFlags()
 	{
-		return jumpFlag || wjFlag || slideFlag || bonkFlag || diveFlag || rollFlag || jumpBuffer || actionBuffer;
+		return jumpFlag || wjFlag || wallstickFlag || slideFlag || bonkFlag || diveFlag || rollFlag || jumpBuffer || actionBuffer;
 	}
 
 	/*
-	 * Sets all flags and buffered actions to false.
-	 * EXCEPT HITFLAG. That one will be unaffacted.
+	 * Sets all flags to false.
+	 * EXCEPT hitFlag in actionInProgress.
 	 * */
 	private void clearAllFlags()
 	{
 		jumpFlag = false;
 		wjFlag = false;
+		wallstickFlag = false;
 		slideFlag = false;
 		bonkFlag = false;
 		diveFlag = false;
 		rollFlag = false;
+	}
+
+	/*
+	 * Sets all buffered actions to false.
+	 * */
+	private void clearAllBuffers()
+	{
 		jumpBuffer = false;
-		actionBuffer = false;;
+		actionBuffer = false;
 	}
 
 	/*
