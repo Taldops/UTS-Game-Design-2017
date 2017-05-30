@@ -377,6 +377,10 @@ public class PlayerControl : MonoBehaviour {
 				{
 					newVelocity = new Vector2(rigid.velocity.x, wjMinUp);
 				}
+				if(Mathf.Abs(newVelocity.x) < (1-angleFactor) * actionThresh)
+				{
+					newVelocity = new Vector2(Mathf.Sign(newVelocity.x) * (1-angleFactor) * actionThresh, newVelocity.y);
+				}
 				if(Mathf.Abs(newVelocity.x) > 1)
 				{
 					flipper.FaceDir(jumpvec.x > 0);
