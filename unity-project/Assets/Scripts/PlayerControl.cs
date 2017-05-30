@@ -121,11 +121,6 @@ public class PlayerControl : MonoBehaviour {
 		updateAnimation();
 		updateChecks();
 		bufferActions();
-		if(!wjFlag)
-		{
-			checkForWalljump();
-		}
-		stateDependentUpdate();
 		if(!actionInProgress)
 		{
 			initiateActions();
@@ -137,7 +132,13 @@ public class PlayerControl : MonoBehaviour {
 	void FixedUpdate ()
 	{
 		basicMovement();
+		stateDependentUpdate();
+		if(!wjFlag)
+		{
+			checkForWalljump();
+		}
 		applyForces();
+		//Not sure if the order is important here
 	}
 
 	/*
@@ -157,6 +158,7 @@ public class PlayerControl : MonoBehaviour {
 		hitFlag = true;
 		actionInProgress = true;
 		clearAllFlags();
+		clearAllBuffers();
 	}
 	
 	/*
@@ -351,7 +353,8 @@ public class PlayerControl : MonoBehaviour {
 			rigid.gravityScale = 0;
 			rigid.velocity = new Vector2(flipper.direction * 10, rigid.velocity.y * 0.0f);
 			flipper.FaceDir(wjVelCache.x > 0);
-			clearAllFlags();
+			clearAllBuffers();
+			wallstickFlag = false;
 			wjFlag = true;
 			//Action still in progress!
 		}
@@ -490,8 +493,10 @@ public class PlayerControl : MonoBehaviour {
 		}
 		groundCheck.transform.localPosition = collCenter + pointToPos;
 		groundCheck.gameObject.GetComponent<BoxCollider2D>().size = new Vector2 (sizeX, checkDepth);
-		//Wallchecks
-		wallCheck.transform.localPosition = collCenter + 0.5f * Mathf.Sign(rigid.velocity.x + 0.2f * flipper.direction) * bodyColl.size.x * Vector3.right + 0.1f * Vector3.up;
+		//Wallcheck
+		float velocitySide = (Mathf.Abs(rigid.velocity.x) > 1) ? Mathf.Sign(rigid.velocity.x) : flipper.direction;
+		float naturalOffset = 0.5f * bodyColl.size.x + 0.2f;
+		wallCheck.transform.localPosition = collCenter + naturalOffset * velocitySide * Vector3.right + 0.1f * Vector3.up;
 		wallCheck.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(checkDepth, checkDepth);
 	}
 
@@ -503,13 +508,12 @@ public class PlayerControl : MonoBehaviour {
 		anim.SetFloat("SpeedX", Mathf.Abs(rigid.velocity.x));
 		anim.SetInteger("Input", (int) Input.GetAxisRaw("Horizontal"));
 		anim.SetBool("DirAlign", Input.GetAxisRaw("Horizontal") * rigid.velocity.x >= 0);
-		anim.SetBool("Busy", busy);
 
 		currentState = anim.GetCurrentAnimatorStateInfo(0);
 		busy = !currentlyInState(runState, idleState, jumpState, fallState, skidState);		//Official List of non-busy states
 		if(Mathf.Abs(rigid.velocity.x) < 1 && Mathf.Abs(rigid.velocity.y) < 1 && !Input.anyKey)
 		{
-			clearAllFlags();
+			clearAllBuffers();
 		}
 		if((!busy || currentlyInState(bonkState)) && groundCheck.overlaps && !currentlyInState(idleState, skidState) && !actionInProgress
 			&& (currentState.fullPathHash != runState || Mathf.Abs(rigid.velocity.x) < 6) && !anyFlags() && Mathf.Abs(rigid.velocity.y) < 1)
@@ -559,23 +563,31 @@ public class PlayerControl : MonoBehaviour {
 	 * */
 	private bool anyFlags()
 	{
-		return jumpFlag || wjFlag || slideFlag || bonkFlag || diveFlag || rollFlag || jumpBuffer || actionBuffer;
+		return jumpFlag || wjFlag || wallstickFlag || slideFlag || bonkFlag || diveFlag || rollFlag || jumpBuffer || actionBuffer;
 	}
 
 	/*
-	 * Sets all flags and buffered actions to false.
-	 * EXCEPT HITFLAG. That one will be unaffacted.
+	 * Sets all flags to false.
+	 * EXCEPT hitFlag in actionInProgress.
 	 * */
 	private void clearAllFlags()
 	{
 		jumpFlag = false;
 		wjFlag = false;
+		wallstickFlag = false;
 		slideFlag = false;
 		bonkFlag = false;
 		diveFlag = false;
 		rollFlag = false;
+	}
+
+	/*
+	 * Sets all buffered actions to false.
+	 * */
+	private void clearAllBuffers()
+	{
 		jumpBuffer = false;
-		actionBuffer = false;;
+		actionBuffer = false;
 	}
 
 	/*
