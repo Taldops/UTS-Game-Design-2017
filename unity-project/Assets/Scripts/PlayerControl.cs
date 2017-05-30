@@ -38,6 +38,7 @@ public class PlayerControl : MonoBehaviour {
 	//Action parameters:
 	public float slideBoost	= 16;		//Speedboost for slide start
 	public float slideBreak = 1.9f;		//How fast you lose speed while sliding
+	public float slideBreakAirMultiplier = 0.75f;		//How much faster/slower you lose speed after sliding off an edge
 	public float maxSlideJumpSpeedFactor = 1.3f; //How much of the normal max speed can be reached with a slideJump
 	public float bonkBounceFactor = 1.3f;	//How much bonking bounces you backwards
 	public float actionThresh = 14; 	//minimum velocity required for a walljumps and slides
@@ -183,7 +184,8 @@ public class PlayerControl : MonoBehaviour {
 		//Sliding Friction
 		if(currentState.fullPathHash == slideState)
 		{
-			rigid.AddForce(Vector2.left * rigid.velocity.x * slideBreak, ForceMode2D.Force);
+			float friction = groundCheck.overlaps ? slideBreak : slideBreak * slideBreakAirMultiplier;
+			rigid.AddForce(Vector2.left * rigid.velocity.x * friction, ForceMode2D.Force);
 		}
 
 		//Always face forward when running
@@ -217,7 +219,7 @@ public class PlayerControl : MonoBehaviour {
 		//Setting the running animation speed
 		if(currentState.fullPathHash == runState)
 		{
-			anim.SetFloat("SpeedMod", Mathf.Max(Mathf.Abs(rigid.velocity.x)/maxSpeed, 0.25f));
+			anim.SetFloat("SpeedMod", Mathf.Max(Mathf.Abs(rigid.velocity.x)/maxSpeed, 0.3f));
 		}
 	}
 
@@ -425,9 +427,9 @@ public class PlayerControl : MonoBehaviour {
 		if(rollFlag)
 		{
 			body.transform.up = Vector3.up;
-			float newVelX = Mathf.Max(Mathf.Abs(rigid.velocity.x), maxSpeed * 0.5f);
+			float newVelX = Mathf.Max(Mathf.Abs(rigid.velocity.x), maxSpeed * 0.75f);
 			rigid.velocity = new Vector2(newVelX * flipper.direction, rigid.velocity.y);
-			anim.SetFloat("SpeedMod", Mathf.Max(Mathf.Abs(newVelX)/maxSpeed, 0.25f));
+			anim.SetFloat("SpeedMod", Mathf.Abs(newVelX)/maxSpeed);
 			rollFlag = false;
 			actionInProgress = false;
 		}
