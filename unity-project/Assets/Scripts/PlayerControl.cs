@@ -15,37 +15,37 @@ using UnityEngine;
 public class PlayerControl : MonoBehaviour {
 
 	// Movement parameters:
-	public float moveForceGround = 70;			// Amount of force added to move the player left and right.
-	public float moveForceAir = 50;			// Amount of force added to move the player left and right.
-	public float maxSpeed = 20;				// The fastest the player can travel in the x axis.
+	public float moveForceGround = 50;			// Amount of force added to move the player left and right.
+	public float moveForceAir = 40;			// Amount of force added to move the player left and right.
+	public float maxSpeed = 22;				// The fastest the player can travel in the x axis.
 	public float maxFallSpeed = 50;
 	public float jumpForce = 30;			// Amount of force added when the player jumps.
 	public float autoBreak = 8;			// How fast the character stops moving if no direction is pressed
 	public float autoBreakAir = 2;		// How much the character deccelerates in the air when no button is pressed
 	public float jumpBreak = 25;		//How quickly you stop rising after the jump button is released
-	public float maxAirAccel = 12;		//The maximum speed the character can reach by accelerating in the air
-	public Vector2 backflipForce = new Vector2(-6, 10);	//Force that gets added to the jump when it is a backflip
-	public float minJumpHight = 22;		//Maximum speed at which releasing jump stops ascension
+	public float maxAirAccel = 14;		//The maximum speed the character can reach by accelerating in the air
+	public Vector2 backflipSpeed = new Vector2(-8, 36);	//Force that gets added to the jump when it is a backflip
+	public float minJumpHight = 28;		//Maximum speed at which releasing jump stops ascension
 
 	//Walljump parameters
 	public float wjAnglePenalty	= 0.25f;	//0: Walljump forcce does not depend on incoming angle, 1: no force when coming in at 90deg
 	public float wjForce = 0.8f;			//Overall multiplier on walljump sterength
 	public float wjGraceWindow = 0.1f;		//How easy it is to walljump
-	public float wjMinUp = 2.0f;			//Minimum upforce a walljump will have
-	public float wjMaxX = 1.7f;				//Maximum x velocity after a walljump
+	public float wjMinUp = 14;			//Minimum upforce a walljump will have
+	public float wjMaxX = 1.3f;				//Maximum x velocity after a walljump
 	public float wjOutAngleBonus = 0.25f;	//How much of a bonus jumping away from a wall gives you
 
 	//Action parameters:
-	public float slideBoost	= 16;		//Speedboost for slide start
-	public float slideBreak = 1.9f;		//How fast you lose speed while sliding
+	public float slideBoost	= 24;		//Speedboost for slide start
+	public float slideBreak = 1.6f;		//How fast you lose speed while sliding
 	public float slideBreakAirMultiplier = 0.75f;		//How much faster/slower you lose speed after sliding off an edge
-	public float maxSlideJumpSpeedFactor = 1.3f; //How much of the normal max speed can be reached with a slideJump
+	public float maxSlideJumpSpeedFactor = 1.4f; //How much of the normal max speed can be reached with a slideJump
 	public float bonkBounceFactor = 1.3f;	//How much bonking bounces you backwards
-	public float actionThresh = 14; 	//minimum velocity required for a walljumps and slides
+	public float actionThresh = 16; 	//minimum velocity required for a walljumps and slides
 
 	//Other parameters
 	public float checkDepth = 1;		//Depth of wall and ground checks. Higher values mean earlier/more sesitive detection
-	public Vector2 hitKnockback = new Vector2(-8, 4);	//Force impact the player recieves upon getting hit
+	public Vector2 hitKnockback = new Vector2(-10, -10);	//Force impact the player recieves upon getting hit
 	public Color speedColor;		//The shadow trail will turn this color when the player is going very fast. Alpha is disregarded.
 
 	//reference shorthand
@@ -85,6 +85,7 @@ public class PlayerControl : MonoBehaviour {
 	bool actionBuffer = false;	//keep track of sliding and diving
 
 	//Force application flags		//TODO Maybe there is a way to generalize these, since usually only one will be active at time?
+	bool backflipFlag = false;
 	bool slideFlag = false;
 	bool diveFlag = false;
 	bool jumpFlag = false;
@@ -146,7 +147,7 @@ public class PlayerControl : MonoBehaviour {
 		{
 			checkForWalljump();
 		}
-		applyForces();
+		applyActionForces();
 		//Not sure if the order is important here
 	}
 
@@ -179,7 +180,7 @@ public class PlayerControl : MonoBehaviour {
 		moveForceAir *= factor;
 		maxSpeed *= factor;
 		maxAirAccel *= factor;
-		backflipForce = new Vector2(backflipForce.x * factor, backflipForce.y);
+		backflipSpeed = new Vector2(backflipSpeed.x * factor, backflipSpeed.y);
 		//TODO: also multiply shadow trail fadeTime and frequency
 	}
 
@@ -341,9 +342,18 @@ public class PlayerControl : MonoBehaviour {
 		//Jumping
 		if(jumpBuffer && (!busy || (currentlyInState(slideState) && Mathf.Abs(rigid.velocity.x) <= maxSpeed * maxSlideJumpSpeedFactor)))
 		{
-			anim.SetTrigger("Jump");
+			if(currentState.fullPathHash == skidState)
+			{
+				backflipFlag = true;
+				anim.SetTrigger("Backflip");
+			}
+			else
+			{
+				jumpFlag = true;
+				anim.SetTrigger("Jump");
+			}
+
 			jumpBuffer = false;
-			jumpFlag = true;
 			actionInProgress = true;
 			return;
 		}
@@ -354,19 +364,24 @@ public class PlayerControl : MonoBehaviour {
 	 * This contains all physics changes caused by actions and state changes.
 	 * The physical effect will be applied if its corresponding flag is set.
 	 */
-	private void applyForces()
+	private void applyActionForces()
 	{
 		//Jumping
 		if(jumpFlag)
 		{
 			rigid.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
-			if(currentlyInState(skidState, backflipState))
-			{	
-				//Doing a backflip might do something special
-				rigid.AddForce(alignForward(backflipForce), ForceMode2D.Impulse);
-				// ^ adding an additional backwards force on a backflip feels good
-			}
 			jumpFlag = false;
+			actionInProgress = false;
+		}
+
+		//backflip
+		if(backflipFlag)
+		{	
+			//Doing a backflip might do something special
+			//rigid.AddForce(alignForward(backflipForce), ForceMode2D.Impulse);
+			rigid.velocity = alignForward(backflipSpeed);
+			// ^ adding an additional backwards force on a backflip feels good
+			backflipFlag = false;
 			actionInProgress = false;
 		}
 
