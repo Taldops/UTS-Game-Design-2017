@@ -26,6 +26,7 @@ public class PlayerControl : MonoBehaviour {
 	public float maxAirAccel = 14;		//The maximum speed the character can reach by accelerating in the air
 	public Vector2 backflipSpeed = new Vector2(-8, 36);	//Force that gets added to the jump when it is a backflip
 	public float minJumpHight = 28;		//Maximum speed at which releasing jump stops ascension
+	public float overspeedSlowdown = 14;		//How fast the player returns to maxSpeed if they are going faster on the ground
 
 	//Walljump parameters
 	public float wjAnglePenalty	= 0.25f;	//0: Walljump forcce does not depend on incoming angle, 1: no force when coming in at 90deg
@@ -148,7 +149,7 @@ public class PlayerControl : MonoBehaviour {
 	{
 		if(alive)
 		{
-			basicMovement();
+			basicMovement(Time.fixedDeltaTime);
 			stateDependentUpdate();
 			if(!wjFlag)
 			{
@@ -276,13 +277,12 @@ public class PlayerControl : MonoBehaviour {
 	/*
 	 * This is responsible for basic left/right control in the air and on the ground.
 	 * */
-	private void basicMovement()
+	private void basicMovement(float timeDelta)
 	{
 		float currentInputMove = Input.GetAxisRaw("Horizontal");
 		//Ground Movement
 		if(currentlyInState(idleState, runState, skidState))
 		{
-			rigid.AddForce(Vector2.right * currentInputMove * moveForceGround, ForceMode2D.Force);
 			if(currentInputMove == 0)	//Slow down when no direction is pressed
 			{
 				rigid.AddForce(Vector2.left * rigid.velocity.x * autoBreak, ForceMode2D.Force);
@@ -291,9 +291,15 @@ public class PlayerControl : MonoBehaviour {
 			{
 				rigid.velocity = new Vector2(0, rigid.velocity.y);
 			}
-			if(Mathf.Abs(rigid.velocity.x) > maxSpeed)	//cap max speed
+			if(Mathf.Abs(rigid.velocity.x) < maxSpeed || currentInputMove * rigid.velocity.x < 0)	//cap max speed
 			{
-				rigid.velocity = new Vector2(Mathf.Sign(rigid.velocity.x) * maxSpeed, rigid.velocity.y);
+				rigid.AddForce(Vector2.right * currentInputMove * moveForceGround, ForceMode2D.Force);
+			}
+			else
+			{
+				float newX = rigid.velocity.x - Mathf.Sign(rigid.velocity.x) * overspeedSlowdown * timeDelta;
+				newX = (Mathf.Abs(Mathf.Sign(rigid.velocity.x) * maxSpeed - newX) < 0.5f) ? maxSpeed * Mathf.Sign(rigid.velocity.x) : newX;
+				rigid.velocity = new Vector2(newX, rigid.velocity.y);
 			}
 		}
 
@@ -704,18 +710,15 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	// For Debugging:
-	/*
 	void OnGUI()
 	{
 		int w = Screen.width, h = Screen.height;
 		GUIStyle style = new GUIStyle();
-		Rect rect = new Rect(0, 0, w, h * 2 / 100);
-		style.alignment = TextAnchor.UpperRight;
+		Rect rect = new Rect(0, 0, w, h);
+		style.alignment = TextAnchor.LowerLeft;
 		style.fontSize = Mathf.RoundToInt(2 * h * 0.02f);
-		string text = string.Format("{0:0.0} ms)", wjCacheAge);
-		string text = (busy) ? "busy" : "free";
+		string text = string.Format("{0:0.0}/{1:0.0})", Mathf.Abs(rigid.velocity.x), maxSpeed);
 		GUI.Label(rect, text, style);
 	}
-	*/
 
 }
