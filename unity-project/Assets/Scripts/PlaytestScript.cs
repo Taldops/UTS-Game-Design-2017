@@ -64,7 +64,6 @@ public class PlaytestScript : MonoBehaviour {
     bool loseTime()
     {
         LevelTime -= Time.deltaTime;
-        Debug.Log("" + LevelTime);
         return LevelTime <= 0;
     }
 

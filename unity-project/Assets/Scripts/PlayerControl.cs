@@ -72,6 +72,7 @@ public class PlayerControl : MonoBehaviour {
 	//internal state
 	AnimatorStateInfo currentState;
 	float gravMem;						//stores original rigidbody.gravityscale
+	float maxSpeedMem;						//stores original maxSpeed
 	Vector2 wjVelCache = Vector2.zero;	//stores velocity that will be used for the walljump
 	float wjCacheAge;					//Keep track of how old ^ is
 	bool busy = false;					//Busy states can't be easily canceled in most cases
@@ -115,6 +116,7 @@ public class PlayerControl : MonoBehaviour {
 		getHitState = Animator.StringToHash("Base Layer.GetHit");
 
 		gravMem = rigid.gravityScale;
+		maxSpeedMem = maxSpeed;
 	}
 
 	// Update is called once per frame
@@ -130,14 +132,7 @@ public class PlayerControl : MonoBehaviour {
 		//Not sure if the order is important here
 
 		//Indicate going fast enough
-		if(Mathf.Abs(rigid.velocity.x) > actionThresh)
-		{
-			anim.gameObject.GetComponent<SpriteRenderer>().color = new Color(0, 0.75f, 0, 1);
-		}
-		else
-		{
-			anim.gameObject.GetComponent<SpriteRenderer>().color = Color.black;
-		}
+		GetComponent<ShadowTrail>().enabled = Mathf.Abs(rigid.velocity.x) > actionThresh;
 	}
 
 	void FixedUpdate ()
@@ -182,6 +177,7 @@ public class PlayerControl : MonoBehaviour {
 		maxSpeed *= factor;
 		maxAirAccel *= factor;
 		backflipForce = new Vector2(backflipForce.x * factor, backflipForce.y);
+		//TODO: also multiply shadow trail fadeTime and frequency
 	}
 
 	/*
@@ -241,7 +237,7 @@ public class PlayerControl : MonoBehaviour {
 		//Setting the running animation speed
 		if(currentState.fullPathHash == runState)
 		{
-			anim.SetFloat("SpeedMod", Mathf.Max(Mathf.Abs(rigid.velocity.x)/maxSpeed, 0.3f));
+			anim.SetFloat("SpeedMod", Mathf.Max(Mathf.Abs(rigid.velocity.x)/maxSpeedMem, 0.3f));
 		}
 	}
 
@@ -451,7 +447,7 @@ public class PlayerControl : MonoBehaviour {
 			body.transform.up = Vector3.up;
 			float newVelX = Mathf.Max(Mathf.Abs(rigid.velocity.x), maxSpeed * 0.75f);
 			rigid.velocity = new Vector2(newVelX * flipper.direction, rigid.velocity.y);
-			anim.SetFloat("SpeedMod", Mathf.Abs(newVelX)/maxSpeed);
+			anim.SetFloat("SpeedMod", Mathf.Abs(newVelX)/maxSpeedMem);
 			rollFlag = false;
 			actionInProgress = false;
 		}
