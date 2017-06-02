@@ -46,6 +46,7 @@ public class PlayerControl : MonoBehaviour {
 	//Other parameters
 	public float checkDepth = 1;		//Depth of wall and ground checks. Higher values mean earlier/more sesitive detection
 	public Vector2 hitKnockback = new Vector2(-8, 4);	//Force impact the player recieves upon getting hit
+	public Color speedColor;		//The shadow trail will turn this color when the player is going very fast. Alpha is disregarded.
 
 	//reference shorthand
 	private Animator anim;
@@ -73,6 +74,7 @@ public class PlayerControl : MonoBehaviour {
 	AnimatorStateInfo currentState;
 	float gravMem;						//stores original rigidbody.gravityscale
 	float maxSpeedMem;						//stores original maxSpeed
+	Color colorMem;
 	Vector2 wjVelCache = Vector2.zero;	//stores velocity that will be used for the walljump
 	float wjCacheAge;					//Keep track of how old ^ is
 	bool busy = false;					//Busy states can't be easily canceled in most cases
@@ -117,6 +119,7 @@ public class PlayerControl : MonoBehaviour {
 
 		gravMem = rigid.gravityScale;
 		maxSpeedMem = maxSpeed;
+		colorMem = GetComponent<ShadowTrail>().trailColor;
 	}
 
 	// Update is called once per frame
@@ -132,7 +135,7 @@ public class PlayerControl : MonoBehaviour {
 		//Not sure if the order is important here
 
 		//Indicate going fast enough
-		GetComponent<ShadowTrail>().enabled = Mathf.Abs(rigid.velocity.x) > actionThresh;
+		updateTrail();
 	}
 
 	void FixedUpdate ()
@@ -549,6 +552,19 @@ public class PlayerControl : MonoBehaviour {
 		{
 			anim.SetTrigger("Fall");
 		}
+	}
+
+	/*
+	 * Updates the speed dependent shadow trail
+	 * */
+	private void updateTrail()
+	{
+		ShadowTrail trail = GetComponent<ShadowTrail>();
+		trail.enabled = Mathf.Abs(rigid.velocity.x) > actionThresh;
+		float speedFactor = (Mathf.Abs(rigid.velocity.x) - actionThresh) / (2.5f * maxSpeedMem - actionThresh);
+		Color trailColor = Color.Lerp(colorMem, speedColor, speedFactor);
+		trailColor = new Color(trailColor.r, trailColor.g, trailColor.b, colorMem.a);
+		trail.trailColor = trailColor;
 	}
 
 	/*
