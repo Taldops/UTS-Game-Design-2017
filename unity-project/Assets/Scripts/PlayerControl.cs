@@ -699,6 +699,7 @@ public class PlayerControl : MonoBehaviour {
 		if(state == diveState) return "Dive";
 		if(state == slideState) return "Slide";
 		if(state == bonkState) return "Bonk";
+		if(state == getHitState) return "Hitstun";
 		return "State not recognized";
 	}
 

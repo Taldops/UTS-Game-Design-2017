@@ -28,7 +28,6 @@ public class PickUp : MonoBehaviour {
                     GameObject.Find("Goal Zone").transform.GetComponent<PlaytestScript>().LevelTime += secondsToAdd;
                     collected = true;
                 }
-                Debug.Log("PlayerPickup");
                 Destroy(this.gameObject); 
 
 

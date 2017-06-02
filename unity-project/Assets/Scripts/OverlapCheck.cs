@@ -17,7 +17,7 @@ public class OverlapCheck : MonoBehaviour {
 	private Transform topLeft;
 	private Transform bottomRight;
 	private int mask;
-	private BoxCollider2D collider;
+	private BoxCollider2D visual;
 
 	void Awake()
 	{
@@ -26,8 +26,8 @@ public class OverlapCheck : MonoBehaviour {
 		topLeft.parent = transform;
 		bottomRight.parent = transform;
 		mask = LayerMask.GetMask(tagList);
-		collider = GetComponent<BoxCollider2D>();
-		collider.enabled = false;
+		visual = GetComponent<BoxCollider2D>();
+		visual.enabled = false;
 	}
 
 	void Update()
@@ -49,8 +49,8 @@ public class OverlapCheck : MonoBehaviour {
 	*/
 	public void updateArea()
 	{
-		topLeft.position = (Vector2) this.transform.position - (0.5f * Vector2.Scale(collider.size, (Vector2) transform.lossyScale));
-		bottomRight.position = (Vector2) this.transform.position + (0.5f * Vector2.Scale(collider.size, (Vector2) transform.lossyScale));
+		topLeft.position = (Vector2) this.transform.position - (0.5f * Vector2.Scale(visual.size, (Vector2) transform.lossyScale));
+		bottomRight.position = (Vector2) this.transform.position + (0.5f * Vector2.Scale(visual.size, (Vector2) transform.lossyScale));
 	}
 
 

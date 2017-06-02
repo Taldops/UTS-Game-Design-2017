@@ -1,5 +1,5 @@
 ﻿/*
- * Modified version of the PlayerControl script from the 2D Platformer sample project
+ * WORK IN PROGRESS! DO NOT USE RIGHT NOW!
  * */
 
 using UnityEngine;
@@ -7,6 +7,10 @@ using System.Collections;
 
 public class CameraComplex : MonoBehaviour 
 {
+	/*
+	 * Commenting everything to get rid of warnings. Uncomment if you want to work on this.
+	 * */
+	/*
 	public GameObject subject;		//Which gameobject to follow
 
 	private Camera cam;
@@ -70,4 +74,5 @@ public class CameraComplex : MonoBehaviour
 		// Set the camera's position to the target position with the same z component.
 		transform.position = new Vector3(newX, newY, transform.position.z);
 	}
+	*/
 }
