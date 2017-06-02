@@ -79,6 +79,7 @@ public class PlayerControl : MonoBehaviour {
 	float wjCacheAge;					//Keep track of how old ^ is
 	bool busy = false;					//Busy states can't be easily canceled in most cases
 	bool actionInProgress = false;		//Makes it so that only one action is applied at a time. Stops wierd interactions
+	bool alive = true;
 
 	//Buffers
 	bool jumpBuffer = false;	//keep track of jumoing
@@ -127,28 +128,42 @@ public class PlayerControl : MonoBehaviour {
 	void Update () {
 		updateAnimation();
 		updateChecks();
-		bufferActions();
-		if(!actionInProgress)
-		{
-			initiateActions();
-			//Busy flag is hadled by each action on their own, because some busy states can be cancelled by specific actions
-		}
-		//Not sure if the order is important here
 
-		//Indicate going fast enough
-		updateTrail();
+		if(alive)
+		{
+			bufferActions();
+			if(!actionInProgress)
+			{
+				initiateActions();
+				//Busy flag is hadled by each action on their own, because some busy states can be cancelled by specific actions
+			}
+			//Not sure if the order is important here
+
+			//Indicate going fast enough
+			updateTrail();
+		}
 	}
 
 	void FixedUpdate ()
 	{
-		basicMovement();
-		stateDependentUpdate();
-		if(!wjFlag)
+		if(alive)
 		{
-			checkForWalljump();
+			basicMovement();
+			stateDependentUpdate();
+			if(!wjFlag)
+			{
+				checkForWalljump();
+			}
+			applyActionForces();
+			//Not sure if the order is important here
 		}
-		applyActionForces();
-		//Not sure if the order is important here
+		else
+		{
+			if(rigid.velocity.sqrMagnitude > 1)
+			{
+				rigid.gameObject.transform.right = -rigid.velocity;
+			}
+		}
 	}
 
 	/*
@@ -182,6 +197,19 @@ public class PlayerControl : MonoBehaviour {
 		maxAirAccel *= factor;
 		backflipSpeed = new Vector2(backflipSpeed.x * factor, backflipSpeed.y);
 		//TODO: also multiply shadow trail fadeTime and frequency
+	}
+
+	/*
+	 * This kills the player
+	 * */
+	public void Die()
+	{
+		alive = false;
+	}
+
+	public bool isAlive()
+	{
+		return alive;
 	}
 
 	/*
@@ -550,6 +578,7 @@ public class PlayerControl : MonoBehaviour {
 		anim.SetFloat("SpeedX", Mathf.Abs(rigid.velocity.x));
 		anim.SetInteger("Input", (int) Input.GetAxisRaw("Horizontal"));
 		anim.SetBool("DirAlign", Input.GetAxisRaw("Horizontal") * rigid.velocity.x >= 0);
+		anim.SetBool("Alive", alive);
 
 		currentState = anim.GetCurrentAnimatorStateInfo(0);
 		busy = !currentlyInState(runState, idleState, jumpState, fallState, skidState);		//Official List of non-busy states

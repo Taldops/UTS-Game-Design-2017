@@ -23,9 +23,12 @@ public class PlayerCharacter : MonoBehaviour {
 
 	public void Hurt(int damage) {
 		if(timeTillHurt <= 0){
-		_health -= damage;
-		this.gameObject.GetComponent<PlayerControl>().GetHit();
-		 timeTillHurt = invincibleTime;
+			_health -= damage;
+			this.gameObject.GetComponent<PlayerControl>().GetHit();
+			if(_health <= 0){
+				this.gameObject.GetComponent<PlayerControl>().Die();
+			}
+			timeTillHurt = invincibleTime;
 		}
 		//Debug.Log("Health: " + _health);
 	}
