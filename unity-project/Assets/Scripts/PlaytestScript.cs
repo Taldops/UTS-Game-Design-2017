@@ -120,7 +120,10 @@ public class PlaytestScript : MonoBehaviour {
             string texttwo = "You Made It";
             GUI.Label(recttwo, texttwo, styletwo);
 			string textthree = string.Format("Completion Time: {0:0.0} s", completionTime);
-			textthree += string.Format(	"\nCoins Collected: {0:0}/{1:0} ({2:0}%)", coinsCollected, coinTotal, (coinsCollected * 100)/coinTotal);
+			if(coinTotal > 0)
+			{
+				textthree += string.Format(	"\nCoins Collected: {0:0}/{1:0} ({2:0}%)", coinsCollected, coinTotal, (coinsCollected * 100)/coinTotal);
+			}
 			GUI.Label(rectthree, textthree, stylethree);
         }
 
