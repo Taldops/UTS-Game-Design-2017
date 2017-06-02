@@ -14,10 +14,17 @@ public class PlaytestScript : MonoBehaviour {
     float timeTillRestart = 2.0f;
     public float LevelTime = 120.0f;
 
+	private float startTime;
+	private float completionTime;
+	private int coinTotal;
+	private int coinsCollected;
+
 	// Use this for initialization
 	void Awake () {
 		player = GameObject.Find("Hero");
 		//startingPos = player.transform.position;
+		startTime = Time.timeSinceLevelLoad;
+		coinTotal = GameObject.FindGameObjectsWithTag("Coin").Length;
 	}
 
 	// Update is called once per frame
@@ -71,6 +78,8 @@ public class PlaytestScript : MonoBehaviour {
 		if(other.gameObject.transform.root.tag == "Player")
 		{
 			completed = true;
+			completionTime = Time.timeSinceLevelLoad - startTime;
+			coinsCollected = coinTotal - GameObject.FindGameObjectsWithTag("Coin").Length;
 		}
 	}
 
@@ -81,6 +90,7 @@ public class PlaytestScript : MonoBehaviour {
 
 		GUIStyle style = new GUIStyle();
         GUIStyle styletwo = new GUIStyle();
+		GUIStyle stylethree = new GUIStyle();
         Rect rect = new Rect(0, 0, w, h * 2 / 100);
 		style.alignment = TextAnchor.UpperRight;
 		style.fontSize = Mathf.RoundToInt(2 * h * 0.02f);
@@ -89,6 +99,11 @@ public class PlaytestScript : MonoBehaviour {
         Rect recttwo = new Rect(0, 0, w, h);
         styletwo.alignment = TextAnchor.MiddleCenter;
         styletwo.fontSize = Mathf.RoundToInt(h / 5);
+
+		Rect rectthree = new Rect(0, h * 0.45f, w, h * 0.5f);
+		stylethree.alignment = TextAnchor.MiddleCenter;
+		stylethree.fontSize = Mathf.RoundToInt(2 * h * 0.02f);
+		stylethree.normal.textColor = completed ? Color.green : Color.black;
         
 
         string text = string.Format("{0:0.0} s", LevelTime);
@@ -96,7 +111,7 @@ public class PlaytestScript : MonoBehaviour {
         if (!player.transform.GetComponent<PlayerCharacter>().alive()) {
             styletwo.normal.textColor = Color.red;
             string texttwo = "You Died";
-        GUI.Label(recttwo, texttwo, styletwo);
+        	GUI.Label(recttwo, texttwo, styletwo);
         }
 
         if (completed)
@@ -104,6 +119,9 @@ public class PlaytestScript : MonoBehaviour {
             styletwo.normal.textColor = Color.green;
             string texttwo = "You Made It";
             GUI.Label(recttwo, texttwo, styletwo);
+			string textthree = string.Format("Completion Time: {0:0.0} s", completionTime);
+			textthree += string.Format(	"\nCoins Collected: {0:0}/{1:0} ({2:0}%)", coinsCollected, coinTotal, (coinsCollected * 100)/coinTotal);
+			GUI.Label(rectthree, textthree, stylethree);
         }
 
         if (failed)
