@@ -4231,6 +4231,14 @@ Prefab:
       propertyPath: _healthTexture
       value: 
       objectReference: {fileID: 2800000, guid: 35d5375b5fc755a4893747fe607fbd98, type: 3}
+    - target: {fileID: 4286483569128284, guid: f82a7a572171473468a1ee2333887480, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 1.53
+      objectReference: {fileID: 0}
+    - target: {fileID: 4286483569128284, guid: f82a7a572171473468a1ee2333887480, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f82a7a572171473468a1ee2333887480, type: 2}
   m_IsPrefabParent: 0
