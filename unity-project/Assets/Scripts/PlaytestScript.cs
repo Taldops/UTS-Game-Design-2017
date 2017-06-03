@@ -18,6 +18,7 @@ public class PlaytestScript : MonoBehaviour {
 	private float completionTime;
 	private int coinTotal;
 	private int coinsCollected;
+    private bool finishingSoundPlayed = false;
 
 	// Use this for initialization
 	void Awake () {
@@ -31,7 +32,10 @@ public class PlaytestScript : MonoBehaviour {
 	void Update () {
 		if(completed)
         {
+            if (!finishingSoundPlayed) { 
 			SoundManager.instance.PlaySingle(SoundManager.instance.finishLevel);
+                finishingSoundPlayed = true;
+            }
             if (timeTillRestart <= 0)
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
@@ -41,7 +45,12 @@ public class PlaytestScript : MonoBehaviour {
 
         failed = loseTime();
 		if(!player.transform.GetComponent<PlayerCharacter>().alive() || failed){
-			SoundManager.instance.PlaySingle(SoundManager.instance.playerDied);
+            if (!finishingSoundPlayed)
+            {
+                SoundManager.instance.PlaySingle(SoundManager.instance.playerDied);
+                finishingSoundPlayed = true;
+            }
+            
             //playerDead();
             if (timeTillRestart <= 0)
             {

@@ -8,8 +8,15 @@ public class Shuriken : MonoBehaviour {
 	private float timeout = 2;
 	private int living = 0;
 	public bool isEnemy;
+    public Vector3 veloctiyMod = Vector3.zero;
+    public Rigidbody2D rigid;
 
-	void Update() {
+    private void Awake()
+    {
+        rigid = this.GetComponent<Rigidbody2D>();
+    }
+    /*
+    void Update() {
 		//transform.Translate(speed * Time.deltaTime, 0, 0);
 		transform.Translate(normalizedDirection * (speed * Time.deltaTime));
 		timeout -= Time.deltaTime;
@@ -18,8 +25,21 @@ public class Shuriken : MonoBehaviour {
 			
 		}
 	}
+    */
 
-	void OnTriggerEnter2D(Collider2D other) {
+    void FixedUpdate()
+    {
+        //transform.Translate(speed * Time.deltaTime, 0, 0);
+        rigid.velocity =  (normalizedDirection * (speed)) + veloctiyMod;
+        timeout -= Time.fixedDeltaTime;
+        if (timeout <= 0)
+        {
+            Destroy(this.gameObject);
+
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other) {
 		//Debug.Log("Triggered");
 		if(isEnemy){
             if(other.transform.parent != null) { 

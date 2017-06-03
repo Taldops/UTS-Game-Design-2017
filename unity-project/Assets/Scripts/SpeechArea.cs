@@ -16,6 +16,7 @@ public class SpeechArea : MonoBehaviour {
                 //player.Hurt(damage);
                 player.SetActive(true);
                 GameObject Message = player.transform.Find("Message").gameObject;
+                message = message.Replace("\\n", "\n");
                 Message.GetComponent<TextMesh>().text = message;
 		}
 	}

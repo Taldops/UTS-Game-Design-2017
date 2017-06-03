@@ -11,7 +11,7 @@ public class UIManager : MonoBehaviour
 	private Slider _musicSlider;
 	void Start ()
 	{
-		_musicSlider = GameObject.Find("Music_Slider").GetComponent<Slider>();
+		//_musicSlider = GameObject.Find("Music_Slider").GetComponent<Slider>();
 	}
 		
 	void Update ()

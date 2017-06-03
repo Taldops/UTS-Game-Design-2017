@@ -123,7 +123,7 @@ MonoBehaviour:
   speed: 10
   secondLocation: {x: 0, y: 0, z: 0}
   moveRight: 1
-  moveTime: 3
+  moveTime: 1
   movedSoFar: 0
 --- !u!114 &114381720806867114
 MonoBehaviour:

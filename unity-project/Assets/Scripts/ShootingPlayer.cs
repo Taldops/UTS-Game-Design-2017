@@ -26,9 +26,10 @@ public class ShootingPlayer : MonoBehaviour {
 					if(tillFire <= 0){
 					if (_shuriken == null) {
 						_shuriken = Instantiate(shurikenPrefab) as GameObject;
-						//GetComponent<Rigidbody>();
-						
-						_shuriken.GetComponent<Shuriken>().normalizedDirection = new Vector3(GetComponentInChildren<FlipSprite>().direction, 0 ,0);
+                    //GetComponent<Rigidbody>();
+                    _shuriken.GetComponent<Shuriken>().veloctiyMod = GetComponentInChildren<Rigidbody2D>().velocity;
+
+                        _shuriken.GetComponent<Shuriken>().normalizedDirection = new Vector3(GetComponentInChildren<FlipSprite>().direction, 0 ,0);
 						_shuriken.GetComponent<Shuriken>().isEnemy = false;	
 						//_shuriken.GetComponent<Shuriken>().speed = 20;						//Vector3.Normalize(target.Position - character.Position)
 						_shuriken.transform.position = this.transform.position; //+ offset;
