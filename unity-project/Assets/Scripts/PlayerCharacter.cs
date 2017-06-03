@@ -34,11 +34,13 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 	
 	public void getPoints(int value) {
+		SoundManager.instance.PlaySingle(SoundManager.instance.pickupCoin);
 		_points += value;
 		//Debug.Log("Health: " + _health);
 	}
 	
 		public void getHealth(int value) {
+		SoundManager.instance.PlaySingle(SoundManager.instance.pickupHealth);
 		_health += value;
 		//Debug.Log("Health: " + _health);
 	}

@@ -26,6 +26,7 @@ GameObject:
   - component: {fileID: 114381720806867114}
   - component: {fileID: 114267240187447170}
   - component: {fileID: 61879316784982674}
+  - component: {fileID: 95775190422943568}
   m_Layer: 10
   m_Name: OldLady
   m_TagString: Enemy
@@ -91,6 +92,23 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 5.69, y: 6.01}
   m_EdgeRadius: 0
+--- !u!95 &95775190422943568
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1726288418750152}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: bca1a9de5bc754a6e8267afc0ae6125f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114267240187447170
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -142,6 +160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb77cfadbddafd34b95ccb810659c1e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  autoFlip: 0
   direction: 0
 --- !u!212 &212295493163773802
 SpriteRenderer:

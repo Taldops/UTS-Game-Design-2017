@@ -31,6 +31,7 @@ public class PlaytestScript : MonoBehaviour {
 	void Update () {
 		if(completed)
         {
+			SoundManager.instance.PlaySingle(SoundManager.instance.finishLevel);
             if (timeTillRestart <= 0)
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
@@ -40,6 +41,7 @@ public class PlaytestScript : MonoBehaviour {
 
         failed = loseTime();
 		if(!player.transform.GetComponent<PlayerCharacter>().alive() || failed){
+			SoundManager.instance.PlaySingle(SoundManager.instance.playerDied);
             //playerDead();
             if (timeTillRestart <= 0)
             {

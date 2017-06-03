@@ -12,6 +12,13 @@ public class SoundManager : MonoBehaviour
 	public static SoundManager instance = null;     //Allows other scripts to call functions from SoundManager.             
 	public float lowPitchRange = .95f;              //The lowest a sound effect will be randomly pitched.
 	public float highPitchRange = 1.05f;            //The highest a sound effect will be randomly pitched.
+	public AudioClip playerHit;
+	public AudioClip pickupCoin;
+	public AudioClip finishLevel;
+	public AudioClip playerDied;
+	public AudioClip playerJump;
+	public AudioClip pickupHealth;
+	
 
 
 	void Awake ()
@@ -28,7 +35,7 @@ public class SoundManager : MonoBehaviour
 		//Set SoundManager to DontDestroyOnLoad so that it won't be destroyed when reloading our scene.
 //		DontDestroyOnLoad (gameObject);
 	}
-
+	
 
 	//Used to play single sound clips.
 	public void PlaySingle(AudioClip clip)

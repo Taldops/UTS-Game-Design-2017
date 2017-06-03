@@ -179,6 +179,7 @@ public class PlayerControl : MonoBehaviour {
 		*/
 		public void GetHit(float force = 1)
 	{
+		SoundManager.instance.PlaySingle(SoundManager.instance.playerHit);
 		rigid.velocity = Vector2.zero;
 		anim.SetTrigger("GetHit");
 		hitFlag = true;
@@ -385,6 +386,7 @@ public class PlayerControl : MonoBehaviour {
 			{
 				jumpFlag = true;
 				anim.SetTrigger("Jump");
+				//SoundManager.instance.PlaySingle(SoundManager.instance.playerJump);
 			}
 
 			jumpBuffer = false;
