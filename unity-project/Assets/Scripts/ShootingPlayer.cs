@@ -23,8 +23,13 @@ public class ShootingPlayer : MonoBehaviour {
 			if (tillFire <= 0) {
 				SoundManager.instance.PlaySingle (SoundManager.instance.playerShoot);
 				GameObject shuriken = Instantiate (shurikenPrefab) as GameObject;
-				//GetComponent<Rigidbody>();
-				shuriken.GetComponent<Shuriken> ().veloctiyMod = GetComponentInChildren<Rigidbody2D> ().velocity;
+				float velModX = 0;
+				if(GetComponentInChildren<Rigidbody2D> ().velocity.x * GetComponentInChildren<FlipSprite> ().direction >= 0)
+				{
+					velModX = GetComponentInChildren<Rigidbody2D> ().velocity.x;
+				}
+
+				shuriken.GetComponent<Shuriken> ().veloctiyMod = new Vector2(velModX, GetComponentInChildren<Rigidbody2D> ().velocity.y);
 
 				shuriken.GetComponent<Shuriken> ().normalizedDirection = new Vector3 (GetComponentInChildren<FlipSprite> ().direction, 0, 0);
 				shuriken.GetComponent<Shuriken> ().isEnemy = false;	

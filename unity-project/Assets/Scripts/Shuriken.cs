@@ -24,6 +24,10 @@ public class Shuriken : MonoBehaviour
 	{
 		//transform.Translate(speed * Time.deltaTime, 0, 0);
 		rigid.velocity = (normalizedDirection * (speed)) + veloctiyMod;
+		if(Mathf.Abs(rigid.velocity.x) < (normalizedDirection * (speed)).x)
+		{
+			rigid.velocity = (normalizedDirection * (speed));
+		}
 		timeout -= Time.fixedDeltaTime;
 		if (timeout <= 0) {
 			Destroy (this.gameObject);
