@@ -93,8 +93,8 @@ public class PlaytestScript : MonoBehaviour {
 		GUIStyle stylethree = new GUIStyle();
         Rect rect = new Rect(0, 0, w, h * 2 / 100);
 		style.alignment = TextAnchor.UpperRight;
-		style.fontSize = Mathf.RoundToInt(2 * h * 0.02f);
-		style.normal.textColor = completed ? Color.green : Color.black;
+		style.fontSize = Mathf.RoundToInt(2 * h * 0.03f);
+		style.normal.textColor = completed ? Color.green : new Color(0.2f, 0, 0, 1);
 
         Rect recttwo = new Rect(0, 0, w, h);
         styletwo.alignment = TextAnchor.MiddleCenter;
@@ -105,8 +105,8 @@ public class PlaytestScript : MonoBehaviour {
 		stylethree.fontSize = Mathf.RoundToInt(2 * h * 0.02f);
 		stylethree.normal.textColor = completed ? Color.green : Color.black;
         
-
-        string text = string.Format("{0:0.0} s", LevelTime);
+		string text = "Countdown: ";
+        text += string.Format("{0:0} s", LevelTime);
 
         if (!player.transform.GetComponent<PlayerCharacter>().alive()) {
             styletwo.normal.textColor = Color.red;

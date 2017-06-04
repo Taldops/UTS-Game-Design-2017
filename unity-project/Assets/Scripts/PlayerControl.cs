@@ -721,6 +721,7 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	// For Debugging:
+	/*
 	void OnGUI()
 	{
 		int w = Screen.width, h = Screen.height;
@@ -731,5 +732,5 @@ public class PlayerControl : MonoBehaviour {
 		string text = string.Format("{0:0.0}/{1:0.0})", Mathf.Abs(rigid.velocity.x), maxSpeed);
 		GUI.Label(rect, text, style);
 	}
-
+	*/
 }

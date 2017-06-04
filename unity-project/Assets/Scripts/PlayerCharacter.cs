@@ -50,34 +50,13 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 	void OnGUI(){  
 			　　  
-		　　      for (int h =0; h < _health; h++) {  
-			　　          GUI.DrawTexture(new Rect(screenPositionX + (h*iconSizeX),screenPositionY,iconSizeX,iconSizeY),_healthTexture,ScaleMode.ScaleToFit,true,0);  
-				　　      }  
-				int w = Screen.width, j = Screen.height;
+		　　
+		for (int h = 0; h < _health; h++) {  
+			　　
+			GUI.DrawTexture (new Rect (screenPositionX + (h * iconSizeX), screenPositionY, iconSizeX, iconSizeY), _healthTexture, ScaleMode.ScaleToFit, true, 0);  
+		}  
+		int w = Screen.width, j = Screen.height;
 
-		GUIStyle style = new GUIStyle();
-
-		Rect rect = new Rect(0, 0, w/2, j * 5 / 100);
-		style.alignment = TextAnchor.LowerRight;
-		style.fontSize = Mathf.RoundToInt(2 * j * 0.02f);
-		//style.normal.textColor = (windowTimer > 0) ? new Color (0.2f, 0.9f, 0.2f, 1.0f) : new Color (0.3f, 0.4f, 0.3f, 1.0f);
-		string text = "Health: " + _health + " Score: " + _points;
-		GUI.Label(rect, text, style);
-			　　  }  
 	}
-	/*
-	void OnGUI()
-	{
-		//int w = Mathf.RoundToInt(Screen.width * size), h = Mathf.RoundToInt(Screen.height * size);
-		int w = Screen.width, h = Screen.height;
 
-		GUIStyle style = new GUIStyle();
-
-		Rect rect = new Rect(0, 0, w/2, h * 5 / 100);
-		style.alignment = TextAnchor.LowerRight;
-		style.fontSize = Mathf.RoundToInt(2 * h * 0.02f);
-		//style.normal.textColor = (windowTimer > 0) ? new Color (0.2f, 0.9f, 0.2f, 1.0f) : new Color (0.3f, 0.4f, 0.3f, 1.0f);
-		string text = "Health: " + _health + " Score: " + _points;
-		GUI.Label(rect, text, style);
-	}
-	*/
+}
