@@ -42,7 +42,7 @@ Transform:
   m_GameObject: {fileID: 1726288418750152}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -28.26756, y: 3.3, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -147,6 +147,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b763645f2329af49ac0323cd18594fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shootRadiusX: 35
+  shootRadiusY: 20
   shurikenPrefab: {fileID: 1250307788520214, guid: d9d56efd50863aa449f9cd5db5b3bee8,
     type: 2}
 --- !u!114 &114698491878296344

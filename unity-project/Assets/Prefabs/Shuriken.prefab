@@ -74,9 +74,20 @@ BoxCollider2D:
   m_Material: {fileID: 6200000, guid: 260209b8b4756c243805c825ad49bb63, type: 2}
   m_IsTrigger: 1
   m_UsedByEffector: 0
+  m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.1, y: 0.1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
   serializedVersion: 2
   m_Size: {x: 0.1, y: 0.1}
+  m_EdgeRadius: 0
 --- !u!114 &114168270732745588
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -91,6 +102,9 @@ MonoBehaviour:
   speed: 10
   damage: 1
   normalizedDirection: {x: 0, y: 0, z: 0}
+  isEnemy: 0
+  veloctiyMod: {x: 0, y: 0, z: 0}
+  rigid: {fileID: 0}
 --- !u!212 &212434631742273092
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -121,8 +135,13 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 9
   m_Sprite: {fileID: 21300000, guid: b916d76b630312e4793a4246e3522fc2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
