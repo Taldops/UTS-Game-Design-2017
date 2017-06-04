@@ -5,16 +5,7 @@ using UnityEngine;
 public class ChoiceMap : MonoBehaviour
 {
 
-    public Texture backgroundTexture;
-
-
-
-    void OnGUI()
-    {
-
-        GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), backgroundTexture);
-    }
-    public void level1(string sceneName)
+public void level1(string sceneName)
     {
                 Application.LoadLevel(sceneName);
             }
