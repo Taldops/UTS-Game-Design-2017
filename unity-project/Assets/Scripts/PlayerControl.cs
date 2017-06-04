@@ -397,6 +397,10 @@ public class PlayerControl : MonoBehaviour {
 			actionInProgress = true;
 			return;
 		}
+		if(currentState.fullPathHash == slideState && !groundCheck.overlaps)
+		{
+			jumpBuffer = false;
+		}
 		//TODO Can actionInProgress = true be centralized somehow?
 	}
 
