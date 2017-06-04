@@ -3036,7 +3036,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: The hight of your walljump depends on your incoming speed and angle
+  m_Text: The height of your walljump depends on your incoming speed and angle
 --- !u!222 &1646311873
 CanvasRenderer:
   m_ObjectHideFlags: 0
