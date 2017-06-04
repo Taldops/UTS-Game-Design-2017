@@ -18,6 +18,12 @@ public class SoundManager : MonoBehaviour
 	public AudioClip playerDied;
 	public AudioClip playerJump;
 	public AudioClip pickupHealth;
+	public AudioClip hitEnemy;
+	public AudioClip slide;
+	public AudioClip bonk;
+	public AudioClip landing;
+	public AudioClip playerShoot;
+	public AudioClip enemyShoot;
 	
 
 

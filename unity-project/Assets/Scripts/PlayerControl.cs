@@ -256,12 +256,14 @@ public class PlayerControl : MonoBehaviour {
 			//Using cos makes for smoother transitions than just transform.right = rigid.velocity
 			if(wallCheck.overlaps)	//bonking
 			{
+				SoundManager.instance.PlaySingle(SoundManager.instance.bonk);
 				anim.SetTrigger("Bonk");
 				bonkFlag = true;
 				actionInProgress = true;
 			}
 			if(groundCheck.overlaps && !wallCheck.overlaps)	//rolling
 			{
+				SoundManager.instance.PlaySingle(SoundManager.instance.landing);
 				anim.SetTrigger("Roll");
 				rollFlag = true;
 				actionInProgress = true;
@@ -354,6 +356,7 @@ public class PlayerControl : MonoBehaviour {
 		if(actionBuffer && !busy && groundCheck.overlaps && Mathf.Abs(rigid.velocity.x) > actionThresh && !wallCheck.overlaps
 			&& currentlyInState(runState, skidState, idleState)) //Slide
 		{
+			SoundManager.instance.PlaySingle(SoundManager.instance.slide);
 			anim.SetTrigger("Action");
 			actionBuffer = false;
 			slideFlag = true;
@@ -366,6 +369,7 @@ public class PlayerControl : MonoBehaviour {
 			&& currentlyInState(jumpState, fallState, backflipState))
 		{
 			//Commence dive
+			SoundManager.instance.PlaySingle(SoundManager.instance.slide);
 			rigid.velocity = new Vector2(flipper.direction * Mathf.Max(Mathf.Abs(rigid.velocity.x), maxSpeed) , rigid.velocity.y);
 			anim.SetTrigger("Action");
 			actionBuffer = false;
@@ -439,6 +443,7 @@ public class PlayerControl : MonoBehaviour {
 			rigid.gravityScale = gravMem;
 			if(currentState.fullPathHash == jumpState && wjFlag == true)
 			{
+				SoundManager.instance.PlaySingle(SoundManager.instance.playerJump);
 				//Calculating and applying outgoing angle and power
 				Vector2 incomingVelocity = new Vector2(wjVelCache.x, Mathf.Max(rigid.velocity.y, wjVelCache.y));
 				float angleFactor = 0.5f * (Input.GetAxisRaw("Horizontal") * Mathf.Sign(incomingVelocity.x) + 1);	//1 means up, 0 means 45 degrees
@@ -597,6 +602,10 @@ public class PlayerControl : MonoBehaviour {
 		if((!busy || currentlyInState(bonkState)) && groundCheck.overlaps && !currentlyInState(idleState, skidState) && !actionInProgress
 			&& (currentState.fullPathHash != runState || Mathf.Abs(rigid.velocity.x) < 6) && !anyFlags() && Mathf.Abs(rigid.velocity.y) < 1)
 		{
+			if (currentlyInState(jumpState, fallState, backflipState))
+			{
+				SoundManager.instance.PlaySingle(SoundManager.instance.landing);
+			}
 			anim.SetTrigger("Idle");
 		}
 		if(currentState.fullPathHash != fallState && !busy && !groundCheck.overlaps && rigid.velocity.y < 6

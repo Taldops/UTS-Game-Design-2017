@@ -18,23 +18,20 @@ public class ShootingEnemy : MonoBehaviour {
 	}
 	
 	void Update() {
-		//if (_alive) {
-		//	transform.Translate(0, 0, speed * Time.deltaTime);
-					tillFire -= Time.deltaTime;
-					if(tillFire <= 0){
-					if (_shuriken == null) {
-						_shuriken = Instantiate(shurikenPrefab) as GameObject;
-						//GetComponent<Rigidbody>();
-						_shuriken.GetComponent<Shuriken>().normalizedDirection = Vector3.Normalize(GameObject.Find("Hero").transform.position - this.transform.position);
-						_shuriken.GetComponent<Shuriken>().isEnemy = true;					//Vector3.Normalize(target.Position - character.Position)
-						_shuriken.transform.position = this.transform.position; //+ offset;
-						//Debug.Log("Fired");
-						//_fireball.transform.rotation = transform.rotation;
-						tillFire = fireRate;
-					}
-					}
-			
-		//}
+		tillFire -= Time.deltaTime;
+		if(tillFire <= 0){
+			if (_shuriken == null) {
+				SoundManager.instance.PlaySingle(SoundManager.instance.enemyShoot);
+				_shuriken = Instantiate(shurikenPrefab) as GameObject;
+				//GetComponent<Rigidbody>();
+				_shuriken.GetComponent<Shuriken>().normalizedDirection = Vector3.Normalize(GameObject.Find("Hero").transform.position - this.transform.position);
+				_shuriken.GetComponent<Shuriken>().isEnemy = true;					//Vector3.Normalize(target.Position - character.Position)
+				_shuriken.transform.position = this.transform.position; //+ offset;
+				//Debug.Log("Fired");
+				//_fireball.transform.rotation = transform.rotation;
+				tillFire = fireRate;
+			}
+		}
 	}
 /*
 	public void SetAlive(bool alive) {

@@ -136,9 +136,15 @@ MonoBehaviour:
   musicSource: {fileID: 0}
   lowPitchRange: 0.95
   highPitchRange: 1.05
-  playerHit: {fileID: 8300000, guid: 5d1d473dbc16f4b41a22c41d4e3c3812, type: 3}
+  playerHit: {fileID: 8300000, guid: 7dab3f38d0eea564998cebc30f87dfac, type: 3}
   pickupCoin: {fileID: 8300000, guid: 4ad2a44ddd2c5422fabc9132d7026881, type: 3}
-  finishLevel: {fileID: 8300000, guid: 6d70950888a4d4a338e74d934dfd595b, type: 3}
-  playerDied: {fileID: 8300000, guid: 2b97d831e112e4c2c9081c5d0ea56776, type: 3}
-  playerJump: {fileID: 8300000, guid: c2c10ff44bcab4cafa32bccea6a9f9dd, type: 3}
-  pickupHealth: {fileID: 8300000, guid: e59582234601e44d6807611213e72b6b, type: 3}
+  finishLevel: {fileID: 8300000, guid: 61c23483d6980bd4b97ebcb1386d1202, type: 3}
+  playerDied: {fileID: 8300000, guid: 1225755dc9602e44fb80c67232408e7e, type: 3}
+  playerJump: {fileID: 8300000, guid: 091bd4a1f1cc3a54aaa5e6a306d38ee3, type: 3}
+  pickupHealth: {fileID: 8300000, guid: 83b558c80da440148a2cb9d40408c711, type: 3}
+  hitEnemy: {fileID: 8300000, guid: b7fa206a84188374484f6eb07e931f38, type: 3}
+  slide: {fileID: 8300000, guid: 252934a947c15b4439e90e40331257ea, type: 3}
+  bonk: {fileID: 8300000, guid: a81d53bf013d77e4483dc6370b2bedd7, type: 3}
+  landing: {fileID: 8300000, guid: 348381ad39128d1478c05cde46baf54c, type: 3}
+  playerShoot: {fileID: 8300000, guid: f70884e3c4358da40af5bd761d6197b3, type: 3}
+  enemyShoot: {fileID: 8300000, guid: 0da84d3e12fc5dd47abdae8844cbac99, type: 3}

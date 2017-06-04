@@ -9,6 +9,7 @@ public class EnemyCharacter : MonoBehaviour {
 	}
 
 	public void Hurt(int damage) {
+		SoundManager.instance.PlaySingle(SoundManager.instance.hitEnemy);
 		_health -= damage;
 		Debug.Log("Health: " + _health);
 		if (_health <= 0){
