@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Magnatize : MonoBehaviour {
+public class Magnetize : MonoBehaviour {
 
 	private Transform trackedPlayer;
 	private Vector3 priviosPos;
