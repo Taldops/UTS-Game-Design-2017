@@ -42,7 +42,7 @@ Transform:
   m_GameObject: {fileID: 1497782790474448}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 6.59, y: -6.33, z: 0}
-  m_LocalScale: {x: 0.69317263, y: 0.69317263, z: 0.69317263}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.69317263}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -66,7 +66,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &61135397036343412
 BoxCollider2D:
   m_ObjectHideFlags: 1

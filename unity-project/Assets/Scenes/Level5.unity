@@ -2221,7 +2221,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4926308501679952, guid: 3f78b67f69128d64c8b8964f3b8a78e5, type: 2}
       propertyPath: m_RootOrder
-      value: 24
+      value: 23
       objectReference: {fileID: 0}
     - target: {fileID: 114841181835357018, guid: 3f78b67f69128d64c8b8964f3b8a78e5,
         type: 2}
@@ -2640,7 +2640,7 @@ Transform:
   - {fileID: 398248328}
   - {fileID: 256551268}
   m_Father: {fileID: 0}
-  m_RootOrder: 23
+  m_RootOrder: 24
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &607845446 stripped
 Transform:
@@ -4812,7 +4812,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 8db0c7c410a2147e782ed6b71d11cb2e, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -7377,7 +7377,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4247163261901960, guid: 5825699d04a79994a9e5f928cdbc6191, type: 2}
       propertyPath: m_LocalScale.x
-      value: -1
+      value: -0.6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5825699d04a79994a9e5f928cdbc6191, type: 2}
