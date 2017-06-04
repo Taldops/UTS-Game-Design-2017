@@ -11,9 +11,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainMenu.unity
     guid: 0d0192dde0620014e86f5b95d4dd9edd
-  - enabled: 0
-    path: Assets/Scenes/TestScene.unity
-    guid: b809b2511bed1c44c9348115f8feef58
   - enabled: 1
     path: Assets/Scenes/ChoiceMap.unity
     guid: 214c274a8e8325e4e816a8a4e925adc7
@@ -32,15 +29,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Level5.unity
     guid: afd8526a0b7b50345bb4630319201b7c
-  - enabled: 0
-    path: Assets/Scenes/PlaytestLevelwithAllsorts.unity
-    guid: aa33658d7da641049b9260044f83d224
-  - enabled: 0
-    path: Assets/Scenes/PlaytestLevel.unity
-    guid: 3c518eb49b7355c48a7d35706cb69d84
-  - enabled: 0
-    path: Assets/Scenes/MovementTests.unity
-    guid: 60162472ede2b894c83f98f5776166df
   - enabled: 1
     path: Assets/Scenes/complete.unity
     guid: 475b77468bfe96e4285202715aedbac9
