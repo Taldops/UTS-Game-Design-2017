@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /*
+ * Leaves a shadow trail behind
+ * NEEDS AN ANIMATOR COMPONENT IN THIS OR ONE OF THE CHILDREN TO WORK!
  * TODO
  * - Interpolate when frequency > FPS
  * */
 public class ShadowTrail : MonoBehaviour {
 
 	public Color trailColor;
-	public float fadeTime;
-	public float frequency;
+	public float fadeTime = 0.12f;	//Time it takes for an individual image to fade
+	public float frequency = 22;	//Frequency of image spawns. Higher number means a smoother, thicker trail
 
 	private float countdown = 0;
 	private SpriteRenderer sprite;
@@ -18,7 +20,7 @@ public class ShadowTrail : MonoBehaviour {
 	// Use this for initialization
 	void Awake () 
 	{
-		sprite = transform.Find("Body").GetComponent<SpriteRenderer>();
+		sprite = GetComponentInChildren<Animator>().gameObject.GetComponent<SpriteRenderer>();
 	}
 	
 	// Update is called once per frame
