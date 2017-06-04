@@ -21,7 +21,7 @@ public class UIManager : MonoBehaviour
 
 	void ScanForKeyStroke()
 	{
-		if (Input.GetKeyDown("escape"))     GM.TogglePauseMenu();
+		if (Input.GetKeyDown(KeyCode.Escape))     GM.TogglePauseMenu();
 	}
 		
 	public void MusicSliderUpdate(float val)
