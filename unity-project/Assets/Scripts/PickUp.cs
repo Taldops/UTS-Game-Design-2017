@@ -22,8 +22,6 @@ public class PickUp : MonoBehaviour
 			if (player != null) {
 				if (!collected) {
 					
-
-
 					player.getPoints (value);
 					GameObject.Find ("Goal Zone").transform.GetComponent<PlaytestScript> ().LevelTime += secondsToAdd;
 					collected = true;

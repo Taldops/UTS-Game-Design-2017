@@ -11,7 +11,7 @@ public class PlaytestScript : MonoBehaviour {
 
     private GameObject player;
 	private Vector3 startingPos;
-    float timeTillRestart = 2.0f;
+    public float timeTillRestart = 4.0f;
     public float LevelTime = 120.0f;
 
 	private float startTime;
@@ -80,6 +80,7 @@ public class PlaytestScript : MonoBehaviour {
 			completed = true;
 			completionTime = Time.realtimeSinceStartup - startTime;
 			coinsCollected = coinTotal - GameObject.FindGameObjectsWithTag("Coin").Length;
+			SoundManager.instance.PlaySingle (SoundManager.instance.finishLevel);
 		}
 	}
 
