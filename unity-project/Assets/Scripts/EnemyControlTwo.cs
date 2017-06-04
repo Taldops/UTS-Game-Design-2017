@@ -92,21 +92,6 @@ public class EnemyControlTwo : MonoBehaviour {
 
 		gravMem = rigid.gravityScale;
 		vCheckX = vaultCheck.transform.localPosition.x;
- 
-						  
-																 
-											 
-							   
-				
-  
-			   
-  
-
-						 
-																 
-											 
-								  
-
 	}
  
 	public float inputMove(){

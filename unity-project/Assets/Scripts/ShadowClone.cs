@@ -32,4 +32,5 @@ public class ShadowClone : MonoBehaviour {
 		clone.name = "Shadow Clone";
 		clone.transform.Find("Body").GetComponent<SpriteRenderer>().color = new Color(0.6f, 0, 1.0f, 0.75f);
 	}
+
 }

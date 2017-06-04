@@ -7,7 +7,6 @@ public class Shuriken : MonoBehaviour
 	public int damage = 1;
 	public Vector3 normalizedDirection;
 	public float timeout = 2;
-	private int living = 0;
 	public bool isEnemy;
 	public Vector3 veloctiyMod = Vector3.zero;
 	public Rigidbody2D rigid;
@@ -16,17 +15,10 @@ public class Shuriken : MonoBehaviour
 	{
 		rigid = this.GetComponent<Rigidbody2D> ();
 	}
-	/*
+
     void Update() {
-		//transform.Translate(speed * Time.deltaTime, 0, 0);
-		transform.Translate(normalizedDirection * (speed * Time.deltaTime));
-		timeout -= Time.deltaTime;
-		if (timeout <= 0){
-			Destroy(this.gameObject);
-			
-		}
+    
 	}
-    */
 
 	void FixedUpdate ()
 	{

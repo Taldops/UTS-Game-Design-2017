@@ -10,7 +10,7 @@ public class ShootingEnemy : MonoBehaviour {
 
 	[SerializeField] private GameObject shurikenPrefab;
 	private GameObject _shuriken;
-	Vector3 offset = new Vector3(0, 30, 0);
+	//Vector3 offset = new Vector3(0, 30, 0);
 	float fireRate = 3;
 	float tillFire = 0;
 	
@@ -44,9 +44,5 @@ public class ShootingEnemy : MonoBehaviour {
 	{
 		return (Mathf.Abs(player.transform.position.x - transform.position.x) < shootRadiusX && Mathf.Abs(player.transform.position.y - transform.position.y) < shootRadiusY);
 	}
-/*
-	public void SetAlive(bool alive) {
-		_alive = alive;
-	}
-	*/
+
 }

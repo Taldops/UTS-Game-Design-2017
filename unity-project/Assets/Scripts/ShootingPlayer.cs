@@ -6,7 +6,7 @@ public class ShootingPlayer : MonoBehaviour {
 	//public float obstacleRange = 5.0f;
 	
 	[SerializeField] private GameObject shurikenPrefab;
-	Vector3 offset = new Vector3(0, 30, 0);
+	//Vector3 offset = new Vector3(0, 30, 0);
 	public float fireCooldown = 1;
 	float tillFire = 0;
 	
@@ -34,9 +34,4 @@ public class ShootingPlayer : MonoBehaviour {
 		}
 	}
 
-/*
-	public void SetAlive(bool alive) {
-		_alive = alive;
-	}
-	*/
 }

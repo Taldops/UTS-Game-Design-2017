@@ -1,25 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class StartButton : MonoBehaviour {
+public class StartButton : MonoBehaviour
+{
 
 	// Use this for initialization
-	void Start () {
+	void Start ()
+	{
 		
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
 		
 	}
-    public void OnStartGame(string sceneName)
-    {
-               Application.LoadLevel(sceneName);
-             }
-     public void OnStartGame(int sceneIndex)
-    {
-               Application.LoadLevel(sceneIndex);
-            }
- }
+
+	public void OnStartGame (string sceneName)
+	{
+		SceneManager.LoadScene (sceneName);
+	}
+
+	public void OnStartGame (int sceneIndex)
+	{
+		SceneManager.LoadScene (sceneIndex);
+	}
+
+}
 

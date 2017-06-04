@@ -1,34 +1,33 @@
 using UnityEngine;
 using System.Collections;
 
-public class HealthPickUp : MonoBehaviour {
+public class HealthPickUp : MonoBehaviour
+{
 	
 	private int value = 1;
 	private bool collected = false;
+
 		
-		
-	void Update() {
+	void Update ()
+	{
 		
 		
 	}
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.transform.parent != null)
-        {
-            PlayerCharacter player = other.transform.parent.GetComponent<PlayerCharacter>();
-            if (player != null)
-            {
-                if (!collected)
-                    player.getHealth(value);
-                collected = true;
-                Debug.Log("PlayerPickup");
-                Destroy(this.gameObject);
-            }
-        }
-    }
-		
-		
+	void OnTriggerEnter2D (Collider2D other)
+	{
+		if (other.transform.parent != null) {
+			PlayerCharacter player = other.transform.parent.GetComponent<PlayerCharacter> ();
+			if (player != null) {
+				if (!collected)
+					player.getHealth (value);
+				collected = true;
+				//Debug.Log ("PlayerPickup");
+				Destroy (this.gameObject);
+			}
+		}
 	}
+		
+}
 	
 

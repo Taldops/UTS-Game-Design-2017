@@ -40,18 +40,14 @@ public class Magnetize : MonoBehaviour {
 	{
 		if (coll.gameObject.transform.root.tag == "Player")
 		{
-			print("entering");
 			trackedPlayer = coll.gameObject.transform.root;
-			//trackedPlayer.parent = this.transform;
 		}
 	}
 
 	void OnCollisionExit2D(Collision2D coll) 
 	{
-		if (trackedPlayer.GetComponentInChildren<Collider2D>() == coll.collider)
+		if (trackedPlayer && trackedPlayer.GetComponentInChildren<Collider2D>() == coll.collider)
 		{
-			print("leaving");
-			//trackedPlayer.parent = null;
 			trackedPlayer = null;
 		}
 	}

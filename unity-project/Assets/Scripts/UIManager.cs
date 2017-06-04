@@ -7,8 +7,8 @@ public class UIManager : MonoBehaviour
 {
 	public GameManager GM;
 	public MusicManager MM;
+	private Slider _musicSlider = null;
 
-	private Slider _musicSlider;
 	void Start ()
 	{
 		//_musicSlider = GameObject.Find("Music_Slider").GetComponent<Slider>();

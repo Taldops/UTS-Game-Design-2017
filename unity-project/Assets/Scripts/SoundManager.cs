@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using UnityEngine;
-using System.Collections;
-
 public class SoundManager : MonoBehaviour 
 {
 	public AudioSource efxSource;                   //Drag a reference to the audio source which will play the sound effects.
