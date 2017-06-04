@@ -4592,7 +4592,12 @@ Prefab:
     - target: {fileID: 114841181835357018, guid: 3f78b67f69128d64c8b8964f3b8a78e5,
         type: 2}
       propertyPath: LevelTime
-      value: 300
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 61629150023555208, guid: 3f78b67f69128d64c8b8964f3b8a78e5,
+        type: 2}
+      propertyPath: m_UsedByComposite
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3f78b67f69128d64c8b8964f3b8a78e5, type: 2}
