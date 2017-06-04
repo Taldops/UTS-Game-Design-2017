@@ -18,13 +18,12 @@ public class PlaytestScript : MonoBehaviour {
 	private float completionTime;
 	private int coinTotal;
 	private int coinsCollected;
-    private bool finishingSoundPlayed = false;
 
 	// Use this for initialization
 	void Awake () {
 		player = GameObject.Find("Hero");
 		//startingPos = player.transform.position;
-		startTime = Time.timeSinceLevelLoad;
+		startTime = Time.realtimeSinceStartup;
 		coinTotal = GameObject.FindGameObjectsWithTag("Coin").Length;
 	}
 
@@ -32,10 +31,6 @@ public class PlaytestScript : MonoBehaviour {
 	void Update () {
 		if(completed)
         {
-            if (!finishingSoundPlayed) { 
-			SoundManager.instance.PlaySingle(SoundManager.instance.finishLevel);
-                finishingSoundPlayed = true;
-            }
             if (timeTillRestart <= 0)
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
@@ -45,12 +40,6 @@ public class PlaytestScript : MonoBehaviour {
 
         failed = loseTime();
 		if(!player.transform.GetComponent<PlayerCharacter>().alive() || failed){
-            if (!finishingSoundPlayed)
-            {
-                SoundManager.instance.PlaySingle(SoundManager.instance.playerDied);
-                finishingSoundPlayed = true;
-            }
-            
             //playerDead();
             if (timeTillRestart <= 0)
             {
@@ -89,7 +78,7 @@ public class PlaytestScript : MonoBehaviour {
 		if(other.gameObject.transform.root.tag == "Player")
 		{
 			completed = true;
-			completionTime = Time.timeSinceLevelLoad - startTime;
+			completionTime = Time.realtimeSinceStartup - startTime;
 			coinsCollected = coinTotal - GameObject.FindGameObjectsWithTag("Coin").Length;
 		}
 	}
