@@ -102,6 +102,7 @@ MonoBehaviour:
   speed: 10
   damage: 1
   normalizedDirection: {x: 0, y: 0, z: 0}
+  timeout: 4
   isEnemy: 0
   veloctiyMod: {x: 0, y: 0, z: 0}
   rigid: {fileID: 0}
