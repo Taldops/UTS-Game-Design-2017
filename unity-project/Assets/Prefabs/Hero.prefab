@@ -417,6 +417,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shurikenPrefab: {fileID: 1250307788520214, guid: d9d56efd50863aa449f9cd5db5b3bee8,
     type: 2}
+  fireCooldown: 1
 --- !u!114 &114562495054740996
 MonoBehaviour:
   m_ObjectHideFlags: 1

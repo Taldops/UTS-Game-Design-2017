@@ -4776,6 +4776,16 @@ Prefab:
       propertyPath: m_SortingLayer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114443440246264992, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: fireRate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114443440246264992, guid: f82a7a572171473468a1ee2333887480,
+        type: 2}
+      propertyPath: fireCooldown
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f82a7a572171473468a1ee2333887480, type: 2}
   m_IsPrefabParent: 0
