@@ -460,7 +460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7fdaa28a14e56149b3d8931832331b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _healthTexture: {fileID: 2800000, guid: 35d5375b5fc755a4893747fe607fbd98, type: 3}
+  _healthTexture: {fileID: 2800000, guid: 7cd583b2b0d204a149a3b2dc49eac033, type: 3}
   screenPositionX: 0
   screenPositionY: 0
   iconSizeX: 25
