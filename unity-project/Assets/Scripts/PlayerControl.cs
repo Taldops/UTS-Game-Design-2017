@@ -386,7 +386,7 @@ public class PlayerControl : MonoBehaviour {
 			{
 				jumpFlag = true;
 				anim.SetTrigger("Jump");
-				//SoundManager.instance.PlaySingle(SoundManager.instance.playerJump);
+				SoundManager.instance.PlaySingle(SoundManager.instance.playerJump);
 			}
 
 			jumpBuffer = false;
